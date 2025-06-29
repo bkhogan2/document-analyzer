@@ -1,3 +1,7 @@
 flask 
 flasgger
 openai
+azure-ai-documentintelligence>=1.0.0
+pydantic
+rich
+python-dotenv
