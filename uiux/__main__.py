@@ -6,6 +6,7 @@ import base64
 import requests
 import time
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
@@ -13,11 +14,55 @@ load_dotenv()
 app = Flask(__name__)
 swagger = Swagger(app)
 
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def verify_tax_document_with_chatgpt(content):
+    """
+    Use ChatGPT to verify if the extracted content represents a valid Form 1040
+    """
+    try:
+        prompt = f"""
+        Analyze the following extracted content from a tax document and determine if it's a valid Form 1040.
+        
+        IMPORTANT: Only Form 1040 documents should be considered valid. All other tax forms (W-2, 1099, etc.) should be marked as invalid.
+        
+        Please provide:
+        1. Is this a valid Form 1040? (Yes/No)
+        3. Confidence level (1-10, where 10 is highest)
+        4. Brief explanation of your assessment
+        5. Any notable issues or missing information
+        
+        Extracted content:
+        {content[:2000]}  # Limit to first 2000 chars to avoid token limits
+        
+        Respond in this exact format:
+        VALID: Yes/No
+        CONFIDENCE: [1-10]
+        EXPLANATION: [your explanation]
+        ISSUES: [any issues found]
+        """
+        
+        response = openai_client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a tax document verification expert. Your job is to determine if a document is a valid Form 1040. Only Form 1040 documents should be marked as valid. All other tax forms should be marked as invalid."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=500
+        )
+        
+        return response.choices[0].message.content.strip()
+        
+    except Exception as e:
+        return f"Error during ChatGPT verification: {str(e)}"
+
 
 @app.route('/analyze-tax', methods=['POST'])
 def analyze_tax_document():
     """
-    Analyze Tax Document with Azure Document Intelligence
+    Analyze Tax Document with Azure Document Intelligence and verify with ChatGPT
     ---
     consumes:
       - multipart/form-data
@@ -29,7 +74,7 @@ def analyze_tax_document():
         description: PDF tax document to analyze (Form 1040, etc.)
     responses:
       200:
-        description: Document analysis completed successfully
+        description: Document analysis and verification completed successfully
         schema:
           type: object
           properties:
@@ -37,6 +82,17 @@ def analyze_tax_document():
               type: boolean
             message:
               type: string
+            validation:
+              type: object
+              properties:
+                is_valid:
+                  type: boolean
+                confidence:
+                  type: integer
+                explanation:
+                  type: string
+                issues:
+                  type: string
             analysis:
               type: object
               description: Full analysis results from Azure Document Intelligence
@@ -117,9 +173,21 @@ def analyze_tax_document():
                 if poll_response.status_code == 200:
                     result = poll_response.json()
                     if result.get('status') == 'succeeded':
+                        # Extract content from Azure response
+                        content = ""
+                        if 'analyzeResult' in result and 'content' in result['analyzeResult']:
+                            content = result['analyzeResult']['content']
+                        
+                        # Verify with ChatGPT
+                        chatgpt_verification = verify_tax_document_with_chatgpt(content)
+                        
+                        # Parse ChatGPT response
+                        validation_result = parse_chatgpt_response(chatgpt_verification)
+                        
                         return jsonify({
                             'success': True,
-                            'message': 'Document analysis completed successfully',
+                            'message': 'Document analysis and verification completed successfully',
+                            'validation': validation_result,
                             'analysis': result
                         })
                     elif result.get('status') == 'failed':
@@ -158,6 +226,49 @@ def analyze_tax_document():
             'success': False,
             'error': f"Unexpected error: {str(e)}"
         }), 500
+
+
+def parse_chatgpt_response(response_text):
+    """
+    Parse the structured response from ChatGPT into a dictionary
+    """
+    try:
+        lines = response_text.split('\n')
+        result = {
+            'is_valid': False,
+            'form_type': 'Unknown',
+            'confidence': 0,
+            'explanation': 'Unable to parse verification response',
+            'issues': 'Unable to parse verification response'
+        }
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('VALID:'):
+                result['is_valid'] = 'yes' in line.lower()
+            elif line.startswith('FORM_TYPE:'):
+                result['form_type'] = line.split(':', 1)[1].strip()
+            elif line.startswith('CONFIDENCE:'):
+                try:
+                    confidence_text = line.split(':', 1)[1].strip()
+                    result['confidence'] = int(confidence_text)
+                except:
+                    result['confidence'] = 0
+            elif line.startswith('EXPLANATION:'):
+                result['explanation'] = line.split(':', 1)[1].strip()
+            elif line.startswith('ISSUES:'):
+                result['issues'] = line.split(':', 1)[1].strip()
+        
+        return result
+        
+    except Exception as e:
+        return {
+            'is_valid': False,
+            'form_type': 'Unknown',
+            'confidence': 0,
+            'explanation': f'Error parsing verification response: {str(e)}',
+            'issues': 'Unable to parse verification response'
+        }
 
 
 @app.route('/models', methods=['GET'])
