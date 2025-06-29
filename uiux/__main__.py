@@ -13,6 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 swagger = Swagger(app)
 
+
 @app.route('/analyze-tax', methods=['POST'])
 def analyze_tax_document():
     """
