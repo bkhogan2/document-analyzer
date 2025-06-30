@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tax Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    #chat-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .user {
+      text-align: right;
+      color: blue;
+    }
+    .bot {
+      text-align: left;
+      color: black;
+    }
+    #file-input {
+      margin-top: 10px;
+    }
+    #submit-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div class="message bot">Hi! Upload your tax document (PDF) and I’ll help analyze it.</div>
+    <input type="file" id="file-input" accept="application/pdf" />
+    <button id="submit-btn">Upload & Analyze</button>
+    <div id="chat-log"></div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById("file-input");
+    const submitBtn = document.getElementById("submit-btn");
+    const chatLog = document.getElementById("chat-log");
+
+    function addMessage(text, sender = "bot") {
+      const msg = document.createElement("div");
+      msg.className = `message ${sender}`;
+      msg.innerText = text;
+      chatLog.appendChild(msg);
+    }
+
+    submitBtn.addEventListener("click", async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        addMessage("Please select a file to upload.", "bot");
+        return;
+      }
+
+      addMessage("Uploading your file...", "bot");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("/analyze-tax", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const result = await response.json();
+        addMessage("Here's what I found:", "bot");
+        addMessage(JSON.stringify(result.analysis, null, 2), "bot");
+        if (result.validation) {
+          addMessage("Validation: " + (result.validation.is_valid ? "✅ Valid" : "❌ Invalid"), "bot");
+          addMessage("Explanation: " + result.validation.explanation, "bot");
+        }
+
+      } catch (error) {
+        addMessage("An error occurred: " + error.message, "bot");
+      }
+    });
+  </script>
+</body>
+</html>

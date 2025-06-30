@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flasgger import Swagger
 from werkzeug.utils import secure_filename
 import os
@@ -11,11 +11,15 @@ from openai import OpenAI
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 swagger = Swagger(app)
 
 # Initialize OpenAI client
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 def verify_tax_document_with_chatgpt(content):
     """
@@ -106,6 +110,7 @@ def analyze_tax_document():
     key = os.getenv("AZ_KEY")
     
     if not endpoint or not key:
+        print("Azure Document Intelligence credentials not configured")
         return jsonify({
             'success': False,
             'error': 'Azure Document Intelligence credentials not configured'
@@ -113,6 +118,7 @@ def analyze_tax_document():
 
     # Check if file was uploaded
     if 'file' not in request.files:
+        print("No file part in request")
         return jsonify({
             'success': False,
             'error': 'No file part in request'
