@@ -83,7 +83,7 @@
 
         const result = await response.json();
         addMessage("Here's what I found:", "bot");
-        addMessage(JSON.stringify(result.analysis, null, 2), "bot");
+        // addMessage(JSON.stringify(result.analysis, null, 2), "bot");
         if (result.validation) {
           addMessage("Validation: " + (result.validation.is_valid ? "✅ Valid" : "❌ Invalid"), "bot");
           addMessage("Explanation: " + result.validation.explanation, "bot");
