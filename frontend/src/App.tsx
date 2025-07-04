@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  CheckCircle, 
   Circle, 
   Search, 
   HelpCircle, 
@@ -16,9 +15,9 @@ import {
   Target,
   Upload,
   X,
-  Check,
-  AlertTriangle
+  Check
 } from 'lucide-react';
+import { StatusIcon, type DocumentStatus } from './components/StatusIcon';
 
 interface UploadedFile {
   name: string;
@@ -300,18 +299,7 @@ function App() {
 
   const visibleItems = showMore ? categories : categories.slice(0, 8);
 
-  const renderStatusIcon = (status: DocumentStatus) => {
-    switch (status) {
-      case 'approved':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
-      case 'error':
-        return <X className="w-5 h-5 text-red-600" />;
-      default:
-        return <Circle className="w-5 h-5 text-gray-400" />;
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -447,7 +435,7 @@ function App() {
                             onMouseLeave={() => setHoveredStatusIcon(null)}
                             className="transition-colors"
                           >
-                            {renderStatusIcon(category.status)}
+                            <StatusIcon status={category.status} />
                           </button>
                           
                           {/* Status Tooltip */}
