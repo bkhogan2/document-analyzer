@@ -72,7 +72,7 @@
       formData.append("file", file);
 
       try {
-        const response = await fetch("/analyze-tax", {
+        const response = await fetch("/tax/analyze", {
           method: "POST",
           body: formData
         });
