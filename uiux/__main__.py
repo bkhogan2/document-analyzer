@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
 import os
 import base64
 import requests
@@ -31,6 +32,7 @@ def verify_tax_document_with_chatgpt(content):
         
         Please provide:
         1. Is this a valid Form 1040? (Yes/No)
+        2. What type of document is this? (e.g., Form 1040, W-2, 1099, etc.)
         3. Confidence level (1-10, where 10 is highest)
         4. Brief explanation of your assessment
         5. Any notable issues or missing information
@@ -40,6 +42,7 @@ def verify_tax_document_with_chatgpt(content):
         
         Respond in this exact format:
         VALID: Yes/No
+        FORM_TYPE: [form type]
         CONFIDENCE: [1-10]
         EXPLANATION: [your explanation]
         ISSUES: [any issues found]
@@ -79,16 +82,16 @@ def upload_file():
         description: File uploaded successfully
     """
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part in request'}), 400
+        raise HTTPException(400, "No file part in request")
 
     file = request.files['file']
     if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+        raise HTTPException(400, "No selected file")
 
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
-    return jsonify({'message': 'File uploaded', 'filename': filename})
+    return {"message": "File uploaded", "filename": filename}
 
 
 @app.route('/analyze-tax', methods=['POST'])
@@ -119,6 +122,8 @@ def analyze_tax_document():
               properties:
                 is_valid:
                   type: boolean
+                form_type:
+                  type: string
                 confidence:
                   type: integer
                 explanation:
@@ -139,32 +144,20 @@ def analyze_tax_document():
     
     if not endpoint or not key:
         print("Azure Document Intelligence credentials not configured")
-        return jsonify({
-            'success': False,
-            'error': 'Azure Document Intelligence credentials not configured'
-        }), 500
+        raise HTTPException(500, "Azure Document Intelligence credentials not configured")
 
     # Check if file was uploaded
     if 'file' not in request.files:
         print("No file part in request")
-        return jsonify({
-            'success': False,
-            'error': 'No file part in request'
-        }), 400
+        raise HTTPException(400, "No file part in request")
 
     file = request.files['file']
     if file.filename == '':
-        return jsonify({
-            'success': False,
-            'error': 'No selected file'
-        }), 400
+        raise HTTPException(400, "No selected file")
 
     # Check file type
     if not file.filename.lower().endswith('.pdf'):
-        return jsonify({
-            'success': False,
-            'error': 'Only PDF files are supported'
-        }), 400
+        raise HTTPException(400, "Only PDF files are supported")
 
     try:
         # Read and encode the PDF file
@@ -192,10 +185,7 @@ def analyze_tax_document():
             # Get the operation location from headers
             operation_location = response.headers.get('Operation-Location')
             if not operation_location:
-                return jsonify({
-                    'success': False,
-                    'error': 'No Operation-Location header received from Azure'
-                }), 500
+                raise HTTPException(500, "No Operation-Location header received from Azure")
             
             # Poll for results
             max_attempts = 30  # 60 seconds max wait time
@@ -218,48 +208,31 @@ def analyze_tax_document():
                         # Parse ChatGPT response
                         validation_result = parse_chatgpt_response(chatgpt_verification)
                         
-                        return jsonify({
+                        return {
                             'success': True,
                             'message': 'Document analysis and verification completed successfully',
                             'validation': validation_result,
                             'analysis': result
-                        })
+                        }
                     elif result.get('status') == 'failed':
-                        return jsonify({
-                            'success': False,
-                            'error': f"Analysis failed: {result.get('error', {}).get('message', 'Unknown error')}"
-                        }), 500
+                        raise HTTPException(500, f"Analysis failed: {result.get('error', {}).get('message', 'Unknown error')}")
                     else:
                         # Still processing, wait and try again
                         time.sleep(2)
                         attempts += 1
                 else:
-                    return jsonify({
-                        'success': False,
-                        'error': f"Error polling results: {poll_response.status_code}"
-                    }), 500
+                    raise HTTPException(500, f"Error polling results: {poll_response.status_code}")
             
-            return jsonify({
-                'success': False,
-                'error': 'Analysis timed out after 60 seconds'
-            }), 500
+            raise HTTPException(500, "Analysis timed out after 60 seconds")
         else:
-            return jsonify({
-                'success': False,
-                'error': f"Error submitting document: {response.status_code}",
-                'details': response.text
-            }), 500
+            raise HTTPException(500, f"Error submitting document: {response.status_code}")
             
+    except HTTPException:
+        raise
     except requests.exceptions.RequestException as e:
-        return jsonify({
-            'success': False,
-            'error': f"Connection error: {str(e)}"
-        }), 500
+        raise HTTPException(500, f"Connection error: {str(e)}")
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f"Unexpected error: {str(e)}"
-        }), 500
+        raise HTTPException(500, f"Unexpected error: {str(e)}")
 
 
 def parse_chatgpt_response(response_text):
@@ -270,6 +243,7 @@ def parse_chatgpt_response(response_text):
         lines = response_text.split('\n')
         result = {
             'is_valid': False,
+            'form_type': 'Unknown',
             'confidence': 0,
             'explanation': 'Unable to parse verification response',
             'issues': 'Unable to parse verification response'
@@ -279,6 +253,8 @@ def parse_chatgpt_response(response_text):
             line = line.strip()
             if line.startswith('VALID:'):
                 result['is_valid'] = 'yes' in line.lower()
+            elif line.startswith('FORM_TYPE:'):
+                result['form_type'] = line.split(':', 1)[1].strip()
             elif line.startswith('CONFIDENCE:'):
                 try:
                     confidence_text = line.split(':', 1)[1].strip()
@@ -295,6 +271,7 @@ def parse_chatgpt_response(response_text):
     except Exception as e:
         return {
             'is_valid': False,
+            'form_type': 'Unknown',
             'confidence': 0,
             'explanation': f'Error parsing verification response: {str(e)}',
             'issues': 'Unable to parse verification response'
@@ -333,10 +310,7 @@ def list_models():
     key = os.getenv("AZ_KEY")
     
     if not endpoint or not key:
-        return jsonify({
-            'success': False,
-            'error': 'Azure Document Intelligence credentials not configured'
-        }), 500
+        raise HTTPException(500, "Azure Document Intelligence credentials not configured")
 
     try:
         # Construct the list models endpoint URL
@@ -354,27 +328,19 @@ def list_models():
             models_data = response.json()
             models = models_data.get('value', [])
             
-            return jsonify({
+            return {
                 'success': True,
                 'models': models
-            })
+            }
         else:
-            return jsonify({
-                'success': False,
-                'error': f"Error fetching models: {response.status_code}",
-                'details': response.text
-            }), 500
+            raise HTTPException(500, f"Error fetching models: {response.status_code}")
             
+    except HTTPException:
+        raise
     except requests.exceptions.RequestException as e:
-        return jsonify({
-            'success': False,
-            'error': f"Connection error: {str(e)}"
-        }), 500
+        raise HTTPException(500, f"Connection error: {str(e)}")
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f"Unexpected error: {str(e)}"
-        }), 500
+        raise HTTPException(500, f"Unexpected error: {str(e)}")
 
 
 if __name__ == '__main__':
