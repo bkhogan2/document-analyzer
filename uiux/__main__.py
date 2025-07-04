@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-from flasgger import Swagger
 from werkzeug.utils import secure_filename
 import os
 import base64
@@ -12,7 +11,6 @@ from openai import OpenAI
 load_dotenv()
 
 app = Flask(__name__, template_folder='templates')
-swagger = Swagger(app)
 
 # Initialize OpenAI client
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -61,6 +59,36 @@ def verify_tax_document_with_chatgpt(content):
         
     except Exception as e:
         return f"Error during ChatGPT verification: {str(e)}"
+
+
+@app.route('/', methods=['POST'])
+def upload_file():
+    """
+    File Upload API
+    ---
+    consumes:
+      - multipart/form-data
+    parameters:
+      - name: file
+        in: formData
+        type: file
+        required: true
+        description: The file to upload
+    responses:
+      200:
+        description: File uploaded successfully
+    """
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in request'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+    return jsonify({'message': 'File uploaded', 'filename': filename})
 
 
 @app.route('/analyze-tax', methods=['POST'])
@@ -242,7 +270,6 @@ def parse_chatgpt_response(response_text):
         lines = response_text.split('\n')
         result = {
             'is_valid': False,
-            'form_type': 'Unknown',
             'confidence': 0,
             'explanation': 'Unable to parse verification response',
             'issues': 'Unable to parse verification response'
@@ -252,8 +279,6 @@ def parse_chatgpt_response(response_text):
             line = line.strip()
             if line.startswith('VALID:'):
                 result['is_valid'] = 'yes' in line.lower()
-            elif line.startswith('FORM_TYPE:'):
-                result['form_type'] = line.split(':', 1)[1].strip()
             elif line.startswith('CONFIDENCE:'):
                 try:
                     confidence_text = line.split(':', 1)[1].strip()
@@ -270,7 +295,6 @@ def parse_chatgpt_response(response_text):
     except Exception as e:
         return {
             'is_valid': False,
-            'form_type': 'Unknown',
             'confidence': 0,
             'explanation': f'Error parsing verification response: {str(e)}',
             'issues': 'Unable to parse verification response'
