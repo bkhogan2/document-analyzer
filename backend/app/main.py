@@ -11,7 +11,7 @@ app = FastAPI(
 )
 
 # Setup templates
-templates = Jinja2Templates(directory="uiux/templates")
+templates = Jinja2Templates(directory="app/templates")
 
 # Include routers
 app.include_router(tax_routes.router)
