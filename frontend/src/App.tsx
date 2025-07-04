@@ -15,6 +15,8 @@ import { StatusIcon, type DocumentStatus } from './components/StatusIcon';
 import { DocumentCard } from './components/DocumentCard';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { getStatusStyling, getStatusTooltip } from './utils/statusUtils';
+import { createUploadedFile } from './utils/fileUtils';
 
 interface UploadedFile {
   name: string;
@@ -192,54 +194,11 @@ function App() {
     );
   };
 
-  const getStatusTooltip = (status: DocumentStatus) => {
-    switch (status) {
-      case 'approved':
-        return 'All Clear! Documents have been validated and approved.';
-      case 'warning':
-        return 'Warning: 3 comments found. Click here for details.';
-      case 'error':
-        return 'Error: Invalid or missing required documents detected.';
-      default:
-        return 'Click to cycle through status options';
-    }
-  };
 
-  const getStatusStyling = (status: DocumentStatus) => {
-    switch (status) {
-      case 'approved':
-        return {
-          background: 'bg-green-50',
-          border: 'border-green-500',
-          iconBg: 'bg-green-100'
-        };
-      case 'warning':
-        return {
-          background: 'bg-yellow-50',
-          border: 'border-yellow-500',
-          iconBg: 'bg-yellow-100'
-        };
-      case 'error':
-        return {
-          background: 'bg-red-50',
-          border: 'border-red-500',
-          iconBg: 'bg-red-100'
-        };
-      default:
-        return {
-          background: 'bg-white',
-          border: 'border-gray-200',
-          iconBg: 'bg-gray-100'
-        };
-    }
-  };
 
   const handleFileUpload = (categoryId: string, files: FileList | null) => {
     if (files && files.length > 0) {
-      const newFiles: UploadedFile[] = Array.from(files).map(file => ({
-        name: file.name,
-        status: Math.random() > 0.7 ? 'rejected' : Math.random() > 0.5 ? 'approved' : 'pending'
-      }));
+      const newFiles: UploadedFile[] = Array.from(files).map(file => createUploadedFile(file));
 
       setCategories(prev => 
         prev.map(category => 

@@ -38,7 +38,7 @@ interface DocumentCardProps {
   fileInputRef: (el: HTMLInputElement | null) => void;
   onMouseEnterStatus: (categoryId: string) => void;
   onMouseLeaveStatus: () => void;
-  getStatusTooltip: (status: DocumentStatus) => React.ReactNode;
+  getStatusTooltip: (status: DocumentStatus) => { title: string; description: string; className: string };
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -111,12 +111,18 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
               <StatusIcon status={category.status} />
             </button>
             {/* Status Tooltip */}
-            {hoveredStatusIcon === category.id && (
-              <div className="absolute bottom-6 right-0 z-50 w-56 p-3 bg-white text-gray-800 text-xs rounded-lg shadow-xl border border-gray-200">
-                <div className="absolute -bottom-1 right-3 w-2 h-2 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
-                {getStatusTooltip(category.status)}
-              </div>
-            )}
+            {hoveredStatusIcon === category.id && (() => {
+              const tooltip = getStatusTooltip(category.status);
+              return (
+                <div className="absolute bottom-6 right-0 z-50 w-56 p-3 bg-white text-gray-800 text-xs rounded-lg shadow-xl border border-gray-200">
+                  <div className="absolute -bottom-1 right-3 w-2 h-2 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
+                  <div>
+                    <div className={`font-semibold mb-1 ${tooltip.className}`}>{tooltip.title}</div>
+                    <div className="text-gray-600">{tooltip.description}</div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
         {/* Uploaded Files List */}
