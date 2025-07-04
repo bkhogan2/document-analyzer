@@ -64,6 +64,20 @@ def verify_tax_document_with_chatgpt(content):
         return f"Error during ChatGPT verification: {str(e)}"
 
 
+def get_uploaded_file():
+    """
+    Get uploaded file from request - works with both Flask and FastAPI patterns
+    """
+    if 'file' not in request.files:
+        raise HTTPException(400, "No file part in request")
+
+    file = request.files['file']
+    if file.filename == '':
+        raise HTTPException(400, "No selected file")
+    
+    return file
+
+
 @app.route('/', methods=['POST'])
 def upload_file():
     """
@@ -81,13 +95,8 @@ def upload_file():
       200:
         description: File uploaded successfully
     """
-    if 'file' not in request.files:
-        raise HTTPException(400, "No file part in request")
-
-    file = request.files['file']
-    if file.filename == '':
-        raise HTTPException(400, "No selected file")
-
+    file = get_uploaded_file()
+    
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
@@ -146,14 +155,8 @@ def analyze_tax_document():
         print("Azure Document Intelligence credentials not configured")
         raise HTTPException(500, "Azure Document Intelligence credentials not configured")
 
-    # Check if file was uploaded
-    if 'file' not in request.files:
-        print("No file part in request")
-        raise HTTPException(400, "No file part in request")
-
-    file = request.files['file']
-    if file.filename == '':
-        raise HTTPException(400, "No selected file")
+    # Get uploaded file
+    file = get_uploaded_file()
 
     # Check file type
     if not file.filename.lower().endswith('.pdf'):
