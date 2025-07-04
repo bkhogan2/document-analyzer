@@ -1,6 +1,7 @@
 import React from 'react';
-import { Upload, X, Check, Circle } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { StatusIcon, DocumentStatus } from './StatusIcon';
+import { FileList } from './FileList';
 
 interface UploadedFile {
   name: string;
@@ -119,29 +120,10 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           </div>
         </div>
         {/* Uploaded Files List */}
-        {hasFiles && (
-          <div className="space-y-1 mb-2">
-            {category.uploadedFiles.map((file, index) => (
-              <div key={index} className="flex items-center justify-between text-xs bg-white rounded px-2 py-1">
-                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  {file.status === 'approved' && <Check className="w-3 h-3 text-green-600 flex-shrink-0" />}
-                  {file.status === 'rejected' && <X className="w-3 h-3 text-red-600 flex-shrink-0" />}
-                  {file.status === 'pending' && <Circle className="w-3 h-3 text-yellow-600 flex-shrink-0" />}
-                  <span className="truncate text-gray-700">{file.name}</span>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemoveFile(category.id, file.name);
-                  }}
-                  className="text-gray-400 hover:text-red-600 transition-colors ml-2 flex-shrink-0"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        <FileList 
+          files={category.uploadedFiles}
+          onRemoveFile={(fileName) => onRemoveFile(category.id, fileName)}
+        />
         {/* Upload Button */}
         <button
           onClick={(e) => {

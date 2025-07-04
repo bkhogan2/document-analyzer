@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Circle, 
-  Search, 
-  HelpCircle, 
-  ChevronLeft, 
+  ChevronLeft,
   ChevronDown,
   Building2,
   FileText,
@@ -12,13 +9,12 @@ import {
   TrendingUp,
   Users,
   CreditCard,
-  Target,
-  Upload,
-  X,
-  Check
+  Target
 } from 'lucide-react';
 import { StatusIcon, type DocumentStatus } from './components/StatusIcon';
 import { DocumentCard } from './components/DocumentCard';
+import { Sidebar } from './components/Sidebar';
+import { Header } from './components/Header';
 
 interface UploadedFile {
   name: string;
@@ -303,67 +299,12 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-48 bg-gray-800 flex flex-col">
-        {/* Logo Section */}
-        <div className="flex items-center justify-center h-28 p-4">
-          <img 
-            src="/public/ampac-large-logo.png" 
-            alt="AMPAC Logo" 
-            className="w-full h-auto object-contain"
-          />
-        </div>
-
-        {/* Navigation Menu */}
-        <div className="flex-1 py-2">
-          <nav className="space-y-1">
-            <a href="#" className="block px-3 py-2 text-white bg-gray-700 text-xs font-medium">
-              SBA Applications
-            </a>
-            <a href="#" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 text-xs font-medium transition-colors">
-              Document Library
-            </a>
-            <a href="#" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 text-xs font-medium transition-colors">
-              Loan Pipeline
-            </a>
-          </nav>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="border-t border-gray-700 p-3">
-          <div className="space-y-2">
-            <a href="#" className="block text-gray-300 hover:text-white text-xs transition-colors">
-              Account Settings
-            </a>
-            <a href="#" className="block text-gray-300 hover:text-white text-xs transition-colors">
-              Sign Out
-            </a>
-          </div>
-        </div>
-      </div>
+      <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-                <ChevronLeft className="w-5 h-5 mr-1" />
-                Back
-              </button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-                <Search className="w-5 h-5 mr-2" />
-                Search
-              </button>
-              <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-                <HelpCircle className="w-5 h-5 mr-2" />
-                Help
-              </button>
-            </div>
-          </div>
-        </div>
+        <Header />
 
         {/* Content */}
         <div className="flex-1 px-8 py-12">
