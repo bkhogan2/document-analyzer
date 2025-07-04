@@ -1,0 +1,22 @@
+{
+  "name": "document-analyzer-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Document Analyzer API",
+  "main": "index.js",
+  "scripts": {
+    "dev": "echo 'Frontend development server - to be implemented'",
+    "build": "echo 'Frontend build - to be implemented'",
+    "test": "echo 'Frontend tests - to be implemented'"
+  },
+  "keywords": ["document-analyzer", "frontend"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
+  }
+} 
