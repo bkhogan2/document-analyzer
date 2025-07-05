@@ -1,13 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Building2,
-  FileText,
-  Banknote,
-  Calculator,
-  TrendingUp,
-  Users,
-  CreditCard,
-} from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
 import { DocumentGrid } from './components/DocumentGrid';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -16,16 +7,24 @@ import { ShowMoreButton } from './components/ShowMoreButton';
 import { PageHeader } from './components/PageHeader';
 import { FooterMessage } from './components/FooterMessage';
 import { getStatusStyling, getStatusTooltip } from './utils/statusUtils';
-import { createUploadedFile } from './utils/fileUtils';
-import type { DocumentStatus, UploadedFile, DocumentCategory } from './types/document';
-import { sbaDocumentCategories } from './data/documentCategories';
+import { useDocumentStore } from './stores/documentStore';
 
 function App() {
-  const [categories, setCategories] = useState(sbaDocumentCategories);
-  const [showMore, setShowMore] = useState(false);
-  const [dragOver, setDragOver] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [hoveredStatusIcon, setHoveredStatusIcon] = useState<string | null>(null);
+  const {
+    categories,
+    showMore,
+    dragOver,
+    isDragging,
+    hoveredStatusIcon,
+    setShowMore,
+    setIsDragging,
+    setDragOver,
+    setHoveredStatusIcon,
+    cycleStatus,
+    uploadFiles,
+    removeFile
+  } = useDocumentStore();
+  
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   // Global drag detection
@@ -62,60 +61,7 @@ function App() {
     };
   }, []);
 
-  const toggleItem = (id: string) => {
-    setCategories(prev => 
-      prev.map(category => 
-        category.id === id 
-          ? { ...category, selected: !category.selected }
-          : category
-      )
-    );
-  };
 
-  const cycleStatus = (categoryId: string) => {
-    setCategories(prev => 
-      prev.map(category => {
-        if (category.id === categoryId) {
-          const statusCycle: DocumentStatus[] = ['none', 'approved', 'warning', 'error'];
-          const currentIndex = statusCycle.indexOf(category.status);
-          const nextIndex = (currentIndex + 1) % statusCycle.length;
-          return { ...category, status: statusCycle[nextIndex] };
-        }
-        return category;
-      })
-    );
-  };
-
-  const handleFileUpload = (categoryId: string, files: FileList | null) => {
-    if (files && files.length > 0) {
-      const newFiles: UploadedFile[] = Array.from(files).map(file => createUploadedFile(file));
-
-      setCategories(prev => 
-        prev.map(category => 
-          category.id === categoryId 
-            ? { 
-                ...category, 
-                selected: true,
-                uploadedFiles: [...category.uploadedFiles, ...newFiles]
-              }
-            : category
-        )
-      );
-    }
-  };
-
-  const removeFile = (categoryId: string, fileName: string) => {
-    setCategories(prev => 
-      prev.map(category => 
-        category.id === categoryId 
-          ? { 
-              ...category, 
-              uploadedFiles: category.uploadedFiles.filter(file => file.name !== fileName)
-            }
-          : category
-      )
-    );
-  };
 
   const handleDragOver = (e: React.DragEvent, categoryId: string) => {
     e.preventDefault();
@@ -136,7 +82,7 @@ function App() {
     setDragOver(null);
     setIsDragging(false);
     const files = e.dataTransfer.files;
-    handleFileUpload(categoryId, files);
+    uploadFiles(categoryId, files);
   };
 
   const openFileDialog = (categoryId: string) => {
@@ -169,7 +115,7 @@ function App() {
               onCycleStatus={cycleStatus}
               onRemoveFile={removeFile}
               onOpenFileDialog={openFileDialog}
-              onFileUpload={handleFileUpload}
+              onFileUpload={uploadFiles}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
