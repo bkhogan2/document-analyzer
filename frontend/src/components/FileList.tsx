@@ -1,10 +1,6 @@
 import React from 'react';
 import { X, Check, Circle } from 'lucide-react';
-
-interface UploadedFile {
-  name: string;
-  status: 'pending' | 'approved' | 'rejected';
-}
+import type { UploadedFile } from '../types/document';
 
 interface FileListProps {
   files: UploadedFile[];

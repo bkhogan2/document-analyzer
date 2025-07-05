@@ -1,21 +1,6 @@
 import React from 'react';
 import { DocumentCard } from './DocumentCard';
-import type { DocumentStatus } from './StatusIcon';
-
-interface UploadedFile {
-  name: string;
-  status: 'pending' | 'approved' | 'rejected';
-}
-
-interface DocumentCategory {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: React.ComponentType<any>;
-  selected: boolean;
-  uploadedFiles: UploadedFile[];
-  status: DocumentStatus;
-}
+import type { DocumentStatus, UploadedFile, DocumentCategory } from '../types/document';
 
 interface DocumentGridProps {
   categories: DocumentCategory[];

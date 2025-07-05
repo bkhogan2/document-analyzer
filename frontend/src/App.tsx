@@ -7,9 +7,7 @@ import {
   TrendingUp,
   Users,
   CreditCard,
-  Target
 } from 'lucide-react';
-import { StatusIcon, type DocumentStatus } from './components/StatusIcon';
 import { DocumentGrid } from './components/DocumentGrid';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -19,23 +17,7 @@ import { PageHeader } from './components/PageHeader';
 import { FooterMessage } from './components/FooterMessage';
 import { getStatusStyling, getStatusTooltip } from './utils/statusUtils';
 import { createUploadedFile } from './utils/fileUtils';
-
-interface UploadedFile {
-  name: string;
-  status: 'pending' | 'approved' | 'rejected';
-}
-
-type DocumentStatus = 'none' | 'approved' | 'warning' | 'error';
-
-interface DocumentCategory {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: React.ComponentType<any>;
-  selected: boolean;
-  uploadedFiles: UploadedFile[];
-  status: DocumentStatus;
-}
+import type { DocumentStatus, UploadedFile, DocumentCategory } from './types/document';
 
 const sbaDocumentCategories: DocumentCategory[] = [
   { 
@@ -195,8 +177,6 @@ function App() {
       })
     );
   };
-
-
 
   const handleFileUpload = (categoryId: string, files: FileList | null) => {
     if (files && files.length > 0) {

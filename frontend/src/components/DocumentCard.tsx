@@ -1,22 +1,8 @@
 import React from 'react';
 import { Upload } from 'lucide-react';
-import { StatusIcon, DocumentStatus } from './StatusIcon';
+import { StatusIcon } from './StatusIcon';
 import { FileList } from './FileList';
-
-interface UploadedFile {
-  name: string;
-  status: 'pending' | 'approved' | 'rejected';
-}
-
-interface DocumentCategory {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: React.ComponentType<any>;
-  selected: boolean;
-  uploadedFiles: UploadedFile[];
-  status: DocumentStatus;
-}
+import type { DocumentStatus, UploadedFile, DocumentCategory } from '../types/document';
 
 interface DocumentCardProps {
   category: DocumentCategory;
