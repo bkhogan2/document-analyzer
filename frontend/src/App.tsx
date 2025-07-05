@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  ChevronLeft,
-  ChevronDown,
   Building2,
   FileText,
   Banknote,
@@ -12,9 +10,13 @@ import {
   Target
 } from 'lucide-react';
 import { StatusIcon, type DocumentStatus } from './components/StatusIcon';
-import { DocumentCard } from './components/DocumentCard';
+import { DocumentGrid } from './components/DocumentGrid';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { FooterButtons } from './components/FooterButtons';
+import { ShowMoreButton } from './components/ShowMoreButton';
+import { PageHeader } from './components/PageHeader';
+import { FooterMessage } from './components/FooterMessage';
 import { getStatusStyling, getStatusTooltip } from './utils/statusUtils';
 import { createUploadedFile } from './utils/fileUtils';
 
@@ -268,76 +270,38 @@ function App() {
         {/* Content */}
         <div className="flex-1 px-8 py-12">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h1 className="text-3xl font-semibold text-gray-900 mb-4">
-                SBA Loan Document Collection
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Upload the required documents for your SBA loan application. All documents should be current and complete.
-              </p>
-            </div>
+            <PageHeader />
 
             {/* Document Categories Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {visibleItems.map((category) => {
-                const Icon = category.icon;
-                const isSelected = category.selected;
-                const isDraggedOver = dragOver === category.id;
-                const hasFiles = category.uploadedFiles.length > 0;
-                const statusStyling = getStatusStyling(category.status);
-                
-                return (
-                  <DocumentCard
-                    key={category.id}
-                    category={category}
-                    isDraggedOver={isDraggedOver}
-                    isDragging={isDragging}
-                    hoveredStatusIcon={hoveredStatusIcon}
-                    statusStyling={statusStyling}
-                    onCycleStatus={cycleStatus}
-                    onRemoveFile={removeFile}
-                    onOpenFileDialog={openFileDialog}
-                    onFileUpload={handleFileUpload}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    fileInputRef={(el) => (fileInputRefs.current[category.id] = el)}
-                    onMouseEnterStatus={setHoveredStatusIcon}
-                    onMouseLeaveStatus={() => setHoveredStatusIcon(null)}
-                    getStatusTooltip={getStatusTooltip}
-                  />
-                );
-              })}
-            </div>
+            <DocumentGrid
+              categories={visibleItems}
+              dragOver={dragOver}
+              isDragging={isDragging}
+              hoveredStatusIcon={hoveredStatusIcon}
+              onCycleStatus={cycleStatus}
+              onRemoveFile={removeFile}
+              onOpenFileDialog={openFileDialog}
+              onFileUpload={handleFileUpload}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              fileInputRefs={fileInputRefs}
+              onMouseEnterStatus={setHoveredStatusIcon}
+              onMouseLeaveStatus={() => setHoveredStatusIcon(null)}
+              getStatusStyling={getStatusStyling}
+              getStatusTooltip={getStatusTooltip}
+            />
 
             {/* Show More Button */}
             {!showMore && categories.length > 8 && (
-              <div className="text-center mb-8">
-                <button
-                  onClick={() => setShowMore(true)}
-                  className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors"
-                >
-                  Show more documents
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                </button>
-              </div>
+              <ShowMoreButton onClick={() => setShowMore(true)} />
             )}
 
             {/* Footer Message */}
-            <div className="text-center text-gray-500 text-sm mb-8">
-              Upload all required documents to proceed with your SBA loan application. Documents will be reviewed for completeness and accuracy.
-            </div>
+            <FooterMessage />
 
             {/* Navigation */}
-            <div className="flex justify-between items-center">
-              <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-                <ChevronLeft className="w-5 h-5 mr-1" />
-                Back
-              </button>
-              <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                Continue to Review
-              </button>
-            </div>
+            <FooterButtons />
           </div>
         </div>
       </div>
