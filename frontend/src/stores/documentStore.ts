@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { DocumentCategory, DocumentStatus } from '../types/document';
 import { sbaDocumentCategories } from '../data/documentCategories';
 import { createUploadedFile } from '../utils/fileUtils';
+import { documentService } from '../services/documentService';
 
 interface DocumentStore {
   // State
@@ -55,9 +56,18 @@ export const useDocumentStore = create<DocumentStore>()(
         }));
       },
       
-      uploadFiles: (categoryId, files) => {
-        if (files && files.length > 0) {
-          const newFiles = Array.from(files).map(file => createUploadedFile(file));
+      uploadFiles: async (categoryId: string, files: FileList | null) => {
+        if (!files || files.length === 0) return;
+        
+        try {
+          // Upload each file to the API
+          for (const file of Array.from(files)) {
+            await documentService.uploadFileToCategory(categoryId, file);
+          }
+          
+          // Update local state with uploaded files
+          const fileArray: File[] = Array.from(files);
+          const newFiles = fileArray.map(file => createUploadedFile(file));
           
           set((state) => ({
             categories: state.categories.map((category) =>
@@ -70,6 +80,10 @@ export const useDocumentStore = create<DocumentStore>()(
                 : category
             )
           }));
+        } catch (error) {
+          console.error('Upload failed:', error);
+          // TODO: Add proper error handling/notification
+          throw error;
         }
       },
       
