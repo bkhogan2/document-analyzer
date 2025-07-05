@@ -79,17 +79,18 @@ export const useDocumentStore = create<DocumentStore>()(
         const documents = get().getDocumentsByCategory(categoryId);
         if (documents.length === 0) return 'none';
         
-        // Check if any documents have error status
+        // Error has highest priority
         if (documents.some(doc => doc.status === 'error')) return 'error';
         
-        // Check if any documents have warning status
+        // Warning next
         if (documents.some(doc => doc.status === 'warning')) return 'warning';
         
-        // If all documents are uploaded/processed, show approved
-        if (documents.every(doc => doc.status === 'uploaded' || doc.status === 'processed')) {
+        // Only show approved if ALL are approved
+        if (documents.every(doc => doc.status === 'approved')) {
           return 'approved';
         }
         
+        // Otherwise, none
         return 'none';
       },
       
