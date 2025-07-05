@@ -28,6 +28,7 @@ interface DocumentStore {
   cycleStatus: (categoryId: string) => void;
   uploadFiles: (categoryId: string, files: FileList | null) => void;
   removeFile: (categoryId: string, fileName: string) => void;
+  deleteDocument: (documentId: string) => Promise<void>;
   
   // Helper methods
   getDocumentsByCategory: (categoryId: string) => Document[];
@@ -154,6 +155,24 @@ export const useDocumentStore = create<DocumentStore>()(
               : category
           )
         }));
+      },
+      
+      deleteDocument: async (documentId: string) => {
+        // Optimistically remove from local state
+        const prevDocuments = get().documents;
+        set({
+          documents: prevDocuments.filter(doc => doc.id !== documentId),
+          error: null
+        });
+        try {
+          await documentService.deleteDocument(documentId);
+        } catch (error: any) {
+          // Restore previous state if error
+          set({
+            documents: prevDocuments,
+            error: error.message || 'Failed to delete document'
+          });
+        }
       }
     }),
     {

@@ -115,4 +115,21 @@ async def get_user_documents(user_id: str):
         documents = document_service.get_user_documents(user_id)
         return documents
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving documents: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Error retrieving documents: {str(e)}")
+
+@router.delete('/documents/{document_id}')
+async def delete_document(document_id: str):
+    """
+    Delete a document and all associated metadata and file from disk.
+    - **document_id**: The document ID to delete
+    Returns:
+    - **message**: Success or not found
+    """
+    try:
+        deleted = document_service.delete_document(document_id)
+        if deleted:
+            return {"message": "Document deleted successfully."}
+        else:
+            raise HTTPException(status_code=404, detail="Document not found.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting document: {str(e)}") 

@@ -121,6 +121,18 @@ export class DocumentService {
       throw error;
     }
   }
+
+  /**
+   * Delete a document by ID
+   */
+  async deleteDocument(documentId: string): Promise<void> {
+    try {
+      await apiClient.delete(`/files/documents/${documentId}`);
+    } catch (error: any) {
+      console.error('Error deleting document:', error);
+      throw error;
+    }
+  }
 }
 
 // Export singleton instance

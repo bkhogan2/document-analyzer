@@ -27,7 +27,8 @@ function App() {
     getCategoryStatus,
     cycleStatus,
     uploadFiles,
-    removeFile
+    removeFile,
+    deleteDocument
   } = useDocumentStore();
   
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
@@ -156,7 +157,7 @@ function App() {
               isDragging={isDragging}
               hoveredStatusIcon={hoveredStatusIcon}
               onCycleStatus={cycleStatus}
-              onRemoveFile={removeFile}
+              onRemoveFile={(_categoryId, fileNameOrId) => deleteDocument(fileNameOrId)}
               onOpenFileDialog={openFileDialog}
               onFileUpload={uploadFiles}
               onDragOver={handleDragOver}

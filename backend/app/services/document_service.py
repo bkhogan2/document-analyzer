@@ -2,7 +2,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi import UploadFile
-from ..models.database import DocumentCategory, Document, User
+from ..models.database import DocumentCategory, Document, User, DocumentStatusHistory
 from ..models.responses import DocumentResponse
 from typing import Optional, List
 
@@ -147,5 +147,30 @@ class DocumentService:
                 )
                 for doc in documents
             ]
+        finally:
+            session.close()
+    
+    def delete_document(self, document_id: str) -> bool:
+        """
+        Delete a document and all associated metadata and file from disk.
+        Args:
+            document_id: The document ID to delete
+        Returns:
+            bool: True if deleted, False if not found
+        """
+        session = self.get_session()
+        try:
+            doc = session.query(Document).filter(Document.id == document_id).first()
+            if not doc:
+                return False
+            # Delete status history
+            session.query(DocumentStatusHistory).filter(DocumentStatusHistory.document_id == document_id).delete()
+            # Delete file from disk
+            if doc.file_path and os.path.exists(doc.file_path):
+                os.remove(doc.file_path)
+            # Delete document
+            session.delete(doc)
+            session.commit()
+            return True
         finally:
             session.close() 

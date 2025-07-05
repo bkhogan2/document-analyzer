@@ -4,7 +4,7 @@ import type { Document } from '../types/api';
 
 interface FileListProps {
   files: Document[];
-  onRemoveFile: (fileName: string) => void;
+  onRemoveFile: (fileId: string) => void;
 }
 
 export const FileList: React.FC<FileListProps> = ({ files, onRemoveFile }) => {
@@ -41,7 +41,7 @@ export const FileList: React.FC<FileListProps> = ({ files, onRemoveFile }) => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onRemoveFile(file.filename);
+              onRemoveFile(file.id);
             }}
             className="text-gray-400 hover:text-red-600 transition-colors ml-2 flex-shrink-0"
           >
