@@ -5,6 +5,7 @@ import type { Document } from '../types/api';
 import { sbaDocumentCategories } from '../data/documentCategories';
 import { createUploadedFile } from '../utils/fileUtils';
 import { documentService } from '../services/documentService';
+import { useNotification } from '../components/NotificationProvider';
 
 interface DocumentStore {
   // State
@@ -29,6 +30,7 @@ interface DocumentStore {
   uploadFiles: (categoryId: string, files: FileList | null) => void;
   removeFile: (categoryId: string, fileName: string) => void;
   deleteDocument: (documentId: string) => Promise<void>;
+  uploadFileToCategory: (categoryId: string, file: File) => Promise<void>;
   
   // Helper methods
   getDocumentsByCategory: (categoryId: string) => Document[];
@@ -112,35 +114,19 @@ export const useDocumentStore = create<DocumentStore>()(
       
       uploadFiles: async (categoryId: string, files: FileList | null) => {
         if (!files || files.length === 0) return;
-        
-        try {
-          // Upload each file to the API
-          for (const file of Array.from(files) as File[]) {
+        const notify = useNotification().notify;
+        let anySuccess = false;
+        for (const file of Array.from(files) as File[]) {
+          try {
             await documentService.uploadFileToCategory(categoryId, file);
+            anySuccess = true;
+          } catch (error: any) {
+            const reason = error?.message || 'Unknown error';
+            notify(`Failed to upload: ${file.name} – ${reason}`, 'error');
           }
-          
-          // Refresh documents from API
+        }
+        if (anySuccess) {
           await get().fetchDocuments();
-          
-          // Update local state with uploaded files
-          const fileArray: File[] = Array.from(files);
-          const newFiles = fileArray.map((file: File) => createUploadedFile(file));
-          
-          set((state) => ({
-            categories: state.categories.map((category) =>
-              category.id === categoryId
-                ? {
-                    ...category,
-                    selected: true,
-                    uploadedFiles: [...category.uploadedFiles, ...newFiles]
-                  }
-                : category
-            )
-          }));
-        } catch (error) {
-          console.error('Upload failed:', error);
-          // TODO: Add proper error handling/notification
-          throw error;
         }
       },
       
@@ -173,6 +159,10 @@ export const useDocumentStore = create<DocumentStore>()(
             error: error.message || 'Failed to delete document'
           });
         }
+      },
+      
+      uploadFileToCategory: async (categoryId: string, file: File) => {
+        await documentService.uploadFileToCategory(categoryId, file);
       }
     }),
     {

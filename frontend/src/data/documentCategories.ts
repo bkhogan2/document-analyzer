@@ -64,32 +64,5 @@ export const sbaDocumentCategories: DocumentCategory[] = [
     selected: false,
     uploadedFiles: [],
     status: 'none'
-  },
-  { 
-    id: 'bank-statements', 
-    title: 'Bank Statements', 
-    subtitle: '(3 months)', 
-    icon: Banknote, 
-    selected: false,
-    uploadedFiles: [],
-    status: 'none'
-  },
-  { 
-    id: 'articles-incorporation', 
-    title: 'Articles of Incorporation', 
-    subtitle: 'or Organization', 
-    icon: FileText, 
-    selected: false,
-    uploadedFiles: [],
-    status: 'none'
-  },
-  { 
-    id: 'operating-agreement', 
-    title: 'Operating Agreement', 
-    subtitle: 'or Bylaws', 
-    icon: FileText, 
-    selected: false,
-    uploadedFiles: [],
-    status: 'none'
   }
 ]; 

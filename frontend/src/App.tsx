@@ -8,6 +8,7 @@ import { PageHeader } from './components/PageHeader';
 import { FooterMessage } from './components/FooterMessage';
 import { getStatusStyling, getStatusTooltip } from './utils/statusUtils';
 import { useDocumentStore } from './stores/documentStore';
+import { useNotification } from './components/NotificationProvider';
 
 function App() {
   const {
@@ -28,9 +29,11 @@ function App() {
     cycleStatus,
     uploadFiles,
     removeFile,
-    deleteDocument
+    deleteDocument,
+    uploadFileToCategory
   } = useDocumentStore();
   
+  const { notify } = useNotification();
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   // Fetch documents on mount
@@ -106,6 +109,23 @@ function App() {
 
   const visibleItems = showMore ? categoriesWithRealStatuses : categoriesWithRealStatuses.slice(0, 8);
 
+  const handleFileUpload = async (categoryId: string, files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    let anySuccess = false;
+    for (const file of Array.from(files)) {
+      try {
+        await uploadFileToCategory(categoryId, file);
+        anySuccess = true;
+      } catch (error: any) {
+        const reason = error?.message || 'Unknown error';
+        notify(`Failed to upload: ${file.name} – ${reason}`, 'error');
+      }
+    }
+    if (anySuccess) {
+      await fetchDocuments();
+    }
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -159,7 +179,7 @@ function App() {
               onCycleStatus={cycleStatus}
               onRemoveFile={(_categoryId, fileNameOrId) => deleteDocument(fileNameOrId)}
               onOpenFileDialog={openFileDialog}
-              onFileUpload={uploadFiles}
+              onFileUpload={handleFileUpload}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
