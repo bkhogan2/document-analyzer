@@ -1,7 +1,20 @@
 import apiClient from './api';
-import type { UploadResponse, UploadOptions, UploadProgress } from '../types/api';
+import type { UploadResponse, UploadOptions, UploadProgress, Document } from '../types/api';
 
 export class DocumentService {
+  /**
+   * Get all documents for a user
+   */
+  async getUserDocuments(userId: string = 'default'): Promise<Document[]> {
+    try {
+      const response = await apiClient.get<Document[]>(`/files/documents/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching documents:', error);
+      throw error;
+    }
+  }
+
   /**
    * Upload a file to a specific category
    */

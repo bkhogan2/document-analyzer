@@ -4,6 +4,22 @@ export interface UploadResponse {
   filename: string;
 }
 
+// Document Type
+export interface Document {
+  id: string;
+  user_id: string;
+  category_id: string;
+  filename: string;
+  original_filename: string;
+  file_path: string;
+  file_size: number;
+  mime_type: string;
+  status: string;
+  status_message?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
 // API Error Types
 export interface ApiError {
   detail: string;

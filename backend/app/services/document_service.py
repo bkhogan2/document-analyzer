@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi import UploadFile
 from ..models.database import DocumentCategory, Document, User
-from typing import Optional
+from ..models.responses import DocumentResponse
+from typing import Optional, List
 
 class DocumentService:
     """Service for document-related operations"""
@@ -110,5 +111,41 @@ class DocumentService:
             
             return document
             
+        finally:
+            session.close()
+    
+    def get_user_documents(self, user_id: str) -> List[DocumentResponse]:
+        """
+        Get all documents for a user
+        
+        Args:
+            user_id: The user ID to retrieve documents for
+            
+        Returns:
+            List[DocumentResponse]: List of documents with metadata
+        """
+        session = self.get_session()
+        try:
+            documents = session.query(Document).filter(
+                Document.user_id == user_id
+            ).order_by(Document.created_at.desc()).all()
+            
+            return [
+                DocumentResponse(
+                    id=doc.id,
+                    user_id=doc.user_id,
+                    category_id=doc.category_id,
+                    filename=doc.filename,
+                    original_filename=doc.original_filename,
+                    file_path=doc.file_path,
+                    file_size=doc.file_size,
+                    mime_type=doc.mime_type,
+                    status=doc.status,
+                    status_message=doc.status_message,
+                    created_at=doc.created_at,
+                    updated_at=doc.updated_at
+                )
+                for doc in documents
+            ]
         finally:
             session.close() 

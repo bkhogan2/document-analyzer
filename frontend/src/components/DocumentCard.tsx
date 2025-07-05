@@ -2,10 +2,12 @@ import React from 'react';
 import { Upload } from 'lucide-react';
 import { StatusIcon } from './StatusIcon';
 import { FileList } from './FileList';
-import type { DocumentStatus, UploadedFile, DocumentCategory } from '../types/document';
+import type { DocumentStatus, DocumentCategory } from '../types/document';
+import type { Document } from '../types/api';
 
 interface DocumentCardProps {
   category: DocumentCategory;
+  documents: Document[];
   isDraggedOver: boolean;
   isDragging: boolean;
   hoveredStatusIcon: string | null;
@@ -29,6 +31,7 @@ interface DocumentCardProps {
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
   category,
+  documents,
   isDraggedOver,
   isDragging,
   hoveredStatusIcon,
@@ -46,7 +49,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   getStatusTooltip,
 }) => {
   const Icon = category.icon;
-  const hasFiles = category.uploadedFiles.length > 0;
+  const hasFiles = documents.length > 0;
 
   return (
     <div
@@ -113,7 +116,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
         </div>
         {/* Uploaded Files List */}
         <FileList 
-          files={category.uploadedFiles}
+          files={documents}
           onRemoveFile={(fileName) => onRemoveFile(category.id, fileName)}
         />
         {/* Upload Button */}

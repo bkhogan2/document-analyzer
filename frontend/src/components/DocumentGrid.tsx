@@ -1,6 +1,7 @@
 import React from 'react';
 import { DocumentCard } from './DocumentCard';
-import type { DocumentStatus, UploadedFile, DocumentCategory } from '../types/document';
+import type { DocumentStatus, DocumentCategory } from '../types/document';
+import type { Document } from '../types/api';
 
 interface DocumentGridProps {
   categories: DocumentCategory[];
@@ -19,6 +20,7 @@ interface DocumentGridProps {
   onMouseLeaveStatus: () => void;
   getStatusStyling: (status: DocumentStatus) => { background: string; border: string; iconBg: string };
   getStatusTooltip: (status: DocumentStatus) => { title: string; description: string; className: string };
+  getDocumentsByCategory: (categoryId: string) => Document[];
 }
 
 export const DocumentGrid: React.FC<DocumentGridProps> = ({
@@ -38,17 +40,19 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
   onMouseLeaveStatus,
   getStatusStyling,
   getStatusTooltip,
+  getDocumentsByCategory,
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       {categories.map((category) => {
         const isDraggedOver = dragOver === category.id;
         const statusStyling = getStatusStyling(category.status);
-        
+        const documents = getDocumentsByCategory(category.id);
         return (
           <DocumentCard
             key={category.id}
             category={category}
+            documents={documents}
             isDraggedOver={isDraggedOver}
             isDragging={isDragging}
             hoveredStatusIcon={hoveredStatusIcon}

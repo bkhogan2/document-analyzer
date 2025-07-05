@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
+from datetime import datetime
 
 class ValidationResult(BaseModel):
     is_valid: bool
@@ -20,4 +21,18 @@ class ModelsResponse(BaseModel):
 
 class UploadResponse(BaseModel):
     message: str
-    filename: str 
+    filename: str
+
+class DocumentResponse(BaseModel):
+    id: str
+    user_id: str
+    category_id: str
+    filename: str
+    original_filename: str
+    file_path: str
+    file_size: int
+    mime_type: str
+    status: str
+    status_message: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None 

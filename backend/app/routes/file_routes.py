@@ -1,7 +1,8 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, Form
+from typing import List
 from ..services.file_service import FileService
 from ..services.document_service import DocumentService
-from ..models.responses import UploadResponse
+from ..models.responses import UploadResponse, DocumentResponse
 
 router = APIRouter(prefix="/files", tags=["files"])
 
@@ -98,4 +99,20 @@ async def upload_file_with_category(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+@router.get('/documents/{user_id}', response_model=List[DocumentResponse])
+async def get_user_documents(user_id: str):
+    """
+    Get all documents for a user
+    
+    - **user_id**: The user ID to retrieve documents for
+    
+    Returns:
+    - List of documents with metadata
+    """
+    try:
+        documents = document_service.get_user_documents(user_id)
+        return documents
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving documents: {str(e)}") 

@@ -34,6 +34,7 @@ class Document(Base):
     mime_type = Column(String, nullable=True)
     upload_date = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String, default="uploaded")  # 'uploaded', 'processing', 'completed', 'failed'
+    status_message = Column(String, nullable=True, default="Uploaded")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     

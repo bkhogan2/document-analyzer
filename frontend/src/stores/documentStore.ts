@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DocumentCategory, DocumentStatus } from '../types/document';
+import type { Document } from '../types/api';
 import { sbaDocumentCategories } from '../data/documentCategories';
 import { createUploadedFile } from '../utils/fileUtils';
 import { documentService } from '../services/documentService';
@@ -8,6 +9,9 @@ import { documentService } from '../services/documentService';
 interface DocumentStore {
   // State
   categories: DocumentCategory[];
+  documents: Document[];
+  isLoading: boolean;
+  error: string | null;
   dragOver: string | null;
   isDragging: boolean;
   hoveredStatusIcon: string | null;
@@ -20,9 +24,14 @@ interface DocumentStore {
   setShowMore: (showMore: boolean) => void;
   
   // Document actions
+  fetchDocuments: (userId?: string) => Promise<void>;
   cycleStatus: (categoryId: string) => void;
   uploadFiles: (categoryId: string, files: FileList | null) => void;
   removeFile: (categoryId: string, fileName: string) => void;
+  
+  // Helper methods
+  getDocumentsByCategory: (categoryId: string) => Document[];
+  getCategoryStatus: (categoryId: string) => DocumentStatus;
 }
 
 export const useDocumentStore = create<DocumentStore>()(
@@ -30,6 +39,9 @@ export const useDocumentStore = create<DocumentStore>()(
     (set, get) => ({
       // Initial state
       categories: sbaDocumentCategories,
+      documents: [],
+      isLoading: false,
+      error: null,
       dragOver: null,
       isDragging: false,
       hoveredStatusIcon: null,
@@ -40,6 +52,46 @@ export const useDocumentStore = create<DocumentStore>()(
       setIsDragging: (isDragging) => set({ isDragging }),
       setHoveredStatusIcon: (categoryId) => set({ hoveredStatusIcon: categoryId }),
       setShowMore: (showMore) => set({ showMore }),
+      
+      // Fetch documents from API
+      fetchDocuments: async (userId = 'default') => {
+        set({ isLoading: true, error: null });
+        try {
+          const documents = await documentService.getUserDocuments(userId);
+          set({ documents, isLoading: false });
+        } catch (error: any) {
+          console.error('Error fetching documents:', error);
+          set({ 
+            error: error.message || 'Failed to fetch documents', 
+            isLoading: false 
+          });
+        }
+      },
+      
+      // Get documents for a specific category
+      getDocumentsByCategory: (categoryId: string) => {
+        const { documents } = get();
+        return documents.filter(doc => doc.category_id === categoryId);
+      },
+      
+      // Get status based on documents in category
+      getCategoryStatus: (categoryId: string) => {
+        const documents = get().getDocumentsByCategory(categoryId);
+        if (documents.length === 0) return 'none';
+        
+        // Check if any documents have error status
+        if (documents.some(doc => doc.status === 'error')) return 'error';
+        
+        // Check if any documents have warning status
+        if (documents.some(doc => doc.status === 'warning')) return 'warning';
+        
+        // If all documents are uploaded/processed, show approved
+        if (documents.every(doc => doc.status === 'uploaded' || doc.status === 'processed')) {
+          return 'approved';
+        }
+        
+        return 'none';
+      },
       
       // Document actions
       cycleStatus: (categoryId) => {
@@ -61,13 +113,16 @@ export const useDocumentStore = create<DocumentStore>()(
         
         try {
           // Upload each file to the API
-          for (const file of Array.from(files)) {
+          for (const file of Array.from(files) as File[]) {
             await documentService.uploadFileToCategory(categoryId, file);
           }
           
+          // Refresh documents from API
+          await get().fetchDocuments();
+          
           // Update local state with uploaded files
           const fileArray: File[] = Array.from(files);
-          const newFiles = fileArray.map(file => createUploadedFile(file));
+          const newFiles = fileArray.map((file: File) => createUploadedFile(file));
           
           set((state) => ({
             categories: state.categories.map((category) =>

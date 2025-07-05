@@ -3,6 +3,7 @@
 Simple test script to verify database setup
 """
 
+import uuid
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.models.database import Base, User, DocumentCategory, Document
@@ -20,23 +21,31 @@ def test_database():
     # Test 1: Check if tables exist
     print("✓ Database connection successful")
     
-    # Test 2: Create a test user
-    test_user = User(email="test@example.com")
+    # Test 2: Create a test user with unique email
+    unique_id = str(uuid.uuid4())[:8]
+    test_email = f"test-{unique_id}@example.com"
+    test_user = User(email=test_email)
     db.add(test_user)
     db.commit()
-    print(f"✓ Created test user: {test_user.id}")
+    print(f"✓ Created test user: {test_user.id} with email: {test_email}")
     
-    # Test 3: Create document categories
-    categories = [
-        DocumentCategory(id="balance-sheet", title="Balance Sheet", subtitle="Financial statements"),
-        DocumentCategory(id="tax-returns", title="Tax Returns", subtitle="Personal and business tax returns"),
-        DocumentCategory(id="debt-schedule", title="Debt Schedule", subtitle="List of outstanding debts")
-    ]
-    
-    for category in categories:
-        db.add(category)
-    db.commit()
-    print(f"✓ Created {len(categories)} document categories")
+    # Test 3: Check existing categories or create new ones
+    existing_categories = db.query(DocumentCategory).all()
+    if existing_categories:
+        print(f"✓ Found {len(existing_categories)} existing document categories")
+        categories = existing_categories
+    else:
+        # Create document categories only if they don't exist
+        categories = [
+            DocumentCategory(id="balance-sheet", title="Balance Sheet", subtitle="Financial statements"),
+            DocumentCategory(id="tax-returns", title="Tax Returns", subtitle="Personal and business tax returns"),
+            DocumentCategory(id="debt-schedule", title="Debt Schedule", subtitle="List of outstanding debts")
+        ]
+        
+        for category in categories:
+            db.add(category)
+        db.commit()
+        print(f"✓ Created {len(categories)} document categories")
     
     # Test 4: Create a test document
     test_document = Document(
@@ -63,10 +72,9 @@ def test_database():
     print(f"  - {category_count} document categories")
     print(f"  - {document_count} documents")
     
-    # Clean up test data
-    db.query(Document).delete()
-    db.query(DocumentCategory).delete()
-    db.query(User).delete()
+    # Clean up test data (only the test document and user we created)
+    db.query(Document).filter(Document.id == test_document.id).delete()
+    db.query(User).filter(User.id == test_user.id).delete()
     db.commit()
     print("✓ Cleaned up test data")
     
