@@ -1,0 +1,10 @@
+openai
+azure-ai-documentintelligence>=1.0.0
+pydantic
+rich
+python-dotenv
+fastapi
+uvicorn
+python-multipart
+sqlalchemy
+jinja2

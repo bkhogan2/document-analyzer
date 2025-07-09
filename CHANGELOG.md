@@ -1,5 +1,5 @@
 # unreleased
 
-# 1.0.0
+# 2.0.0
 
-* [New working Ui/UX to demo to client]
+* [Add change log, pull in the correct branch (main) for latest tag, validate that app works]
