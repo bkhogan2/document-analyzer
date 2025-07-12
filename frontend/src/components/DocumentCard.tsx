@@ -49,23 +49,15 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   };
 
   return (
-    <div
-      className={`relative group cursor-pointer`}
-      onClick={() => onCardClick && onCardClick(category.id)}
-    >
+    <div className="relative group">
       <DragAndDropArea
         onDropFiles={handleDropFiles}
-        overlayContent={
-          <div className="flex flex-col items-center justify-center">
-            <Upload className="w-8 h-8 mb-2 text-gray-500" />
-            <p className="text-sm font-medium text-gray-500">Drop files here</p>
-            <p className="text-xs text-gray-400">or click to browse</p>
-          </div>
-        }
         className={`relative w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${styling.background} ${styling.border} shadow-md hover:shadow-lg ${hasFiles ? 'min-h-[140px] pb-12' : 'pb-12'}`}
       >
+        {/* Card body is the only clickable area for navigation */}
         <div
-          // onClick={() => onCardClick && onCardClick(category.id)}
+          className="cursor-pointer"
+          onClick={() => onCardClick && onCardClick(category.id)}
         >
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center space-x-3">
@@ -115,28 +107,28 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
             files={documents}
             onRemoveFile={(fileName) => onRemoveFile(category.id, fileName)}
           />
-          {/* Upload Button */}
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenFileDialog(category.id);
-            }}
-            variant="text"
-            className="absolute bottom-3 right-3 flex items-center space-x-1 text-xs text-gray-400 hover:text-gray-600"
-          >
-            <Upload className="w-3 h-3" />
-            <span>Upload Files</span>
-          </Button>
-          {/* Hidden File Input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="hidden"
-            onChange={(e) => onFileUpload(category.id, e.target.files)}
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.xlsx,.xls"
-          />
         </div>
+        {/* Upload Button and File Input (not inside clickable area) */}
+        <Button
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onOpenFileDialog(category.id);
+          }}
+          variant="text"
+          className="absolute bottom-3 right-3 flex items-center space-x-1 text-xs text-gray-400 hover:text-gray-600"
+        >
+          <Upload className="w-3 h-3" />
+          <span>Upload Files</span>
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={(e) => onFileUpload(category.id, e.target.files)}
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.xlsx,.xls"
+        />
       </DragAndDropArea>
     </div>
   );
