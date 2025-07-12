@@ -4,7 +4,6 @@ interface DragAndDropAreaProps {
   onDropFiles: (files: FileList) => void;
   className?: string;
   children?: React.ReactNode;
-  overlayContent?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -12,7 +11,6 @@ export const DragAndDropArea: React.FC<DragAndDropAreaProps> = ({
   onDropFiles,
   className = '',
   children,
-  overlayContent,
   disabled = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -66,13 +64,13 @@ export const DragAndDropArea: React.FC<DragAndDropAreaProps> = ({
       style={{ outline: 'none' }}
     >
       {isDragging && !disabled && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black bg-opacity-20 pointer-events-none rounded-xl">
-          {overlayContent || (
-            <span className="text-lg font-semibold text-white drop-shadow">Drop files to upload</span>
-          )}
+        <div className="absolute inset-0 rounded-xl border-2 border-dashed border-blue-400 bg-blue-100 flex flex-col items-center justify-center transition-all duration-200 pointer-events-none">
+          <svg className="w-8 h-8 mb-2 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"></path></svg>
+          <p className="text-sm font-medium text-gray-500">Drop files here</p>
+          <p className="text-xs text-gray-400">or click to browse</p>
         </div>
       )}
-      <div className={isDragging ? 'opacity-50' : ''}>
+      <div className={isDragging ? 'opacity-30' : ''}>
         {children}
       </div>
     </div>
