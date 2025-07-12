@@ -5,6 +5,7 @@ import { getStatusStyling, getStatusTooltip } from '../utils/statusHelpers';
 import { FileList } from './FileList';
 import type { DocumentCategory } from '../types/document';
 import type { Document } from '../types/api';
+import { Button } from './Button';
 
 interface DocumentCardProps {
   category: DocumentCategory;
@@ -108,16 +109,17 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           onRemoveFile={(fileName) => onRemoveFile(category.id, fileName)}
         />
         {/* Upload Button */}
-        <button
+        <Button
           onClick={(e) => {
             e.stopPropagation();
             onOpenFileDialog(category.id);
           }}
-          className="absolute bottom-3 right-3 flex items-center space-x-1 text-gray-400 hover:text-gray-600 transition-colors text-xs"
+          variant="text"
+          className="absolute bottom-3 right-3 flex items-center space-x-1 text-xs text-gray-400 hover:text-gray-600"
         >
           <Upload className="w-3 h-3" />
           <span>Upload Files</span>
-        </button>
+        </Button>
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}

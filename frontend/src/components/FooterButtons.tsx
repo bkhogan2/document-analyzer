@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { Button } from './Button';
 
 interface FooterButtonsProps {
   onBack?: () => void;
@@ -14,19 +15,20 @@ export const FooterButtons: React.FC<FooterButtonsProps> = ({
 }) => {
   return (
     <div className="flex justify-between items-center">
-      <button 
+      <Button 
         onClick={onBack}
-        className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+        variant="text"
+        className="flex items-center"
       >
         <ChevronLeft className="w-5 h-5 mr-1" />
         Back
-      </button>
-      <button 
+      </Button>
+      <Button 
         onClick={onContinue}
-        className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+        variant="primary"
       >
         {continueText}
-      </button>
+      </Button>
     </div>
   );
 }; 
