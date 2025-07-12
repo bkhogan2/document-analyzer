@@ -9,6 +9,7 @@ export interface DocumentCategory {
   id: string;
   title: string;
   subtitle: string;
+  description: string;
   icon: React.ComponentType<unknown>;
   selected: boolean;
   uploadedFiles: UploadedFile[];

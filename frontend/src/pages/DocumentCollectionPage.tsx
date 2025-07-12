@@ -7,6 +7,7 @@ import { FooterMessage } from '../components/FooterMessage';
 import { getStatusStyling, getStatusTooltip } from '../utils/statusUtils';
 import { useDocumentStore } from '../stores/documentStore';
 import { useNotification } from '../components/NotificationProvider';
+import { useNavigate } from 'react-router-dom';
 
 export const DocumentCollectionPage: React.FC = () => {
   const {
@@ -30,6 +31,7 @@ export const DocumentCollectionPage: React.FC = () => {
 
   const { notify } = useNotification();
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDocuments();
@@ -76,6 +78,11 @@ export const DocumentCollectionPage: React.FC = () => {
       notify('Files uploaded successfully!', 'success');
     }
     errors.forEach(msg => notify(msg, 'error'));
+  };
+
+  // Handler to navigate to detail page
+  const handleCardClick = (categoryId: string) => {
+    navigate(`/documents/${categoryId}`);
   };
 
   if (isLoading) {
@@ -127,6 +134,7 @@ export const DocumentCollectionPage: React.FC = () => {
           getStatusStyling={getStatusStyling}
           getStatusTooltip={getStatusTooltip}
           getDocumentsByCategory={useDocumentStore.getState().getDocumentsByCategory}
+          onCardClick={handleCardClick}
         />
         {!showMore && categoriesWithRealStatuses.length > 8 && (
           <ShowMoreButton onClick={() => setShowMore(true)} />
