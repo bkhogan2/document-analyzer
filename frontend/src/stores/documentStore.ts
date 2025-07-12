@@ -167,17 +167,22 @@ export const useDocumentStore = create<DocumentStore>()(
     {
       name: 'document-uploads',
       partialize: (state) => ({
-        // Persist both files and statuses for now (can be changed later)
         categories: state.categories.map(category => ({
           id: category.id,
           uploadedFiles: category.uploadedFiles,
           status: category.status
-        }))
+        })),
+        documents: state.documents
       }),
       // Merge function to handle partial data
       merge: (persistedState: unknown, currentState: DocumentStore) => {
-        if (persistedState && typeof persistedState === 'object' && 'categories' in persistedState) {
-          const ps = persistedState as { categories: DocumentCategory[] };
+        if (
+          persistedState &&
+          typeof persistedState === 'object' &&
+          'categories' in persistedState &&
+          'documents' in persistedState
+        ) {
+          const ps = persistedState as { categories: DocumentCategory[]; documents: Document[] };
           return {
             ...currentState,
             categories: currentState.categories.map(category => {
@@ -189,7 +194,8 @@ export const useDocumentStore = create<DocumentStore>()(
                 uploadedFiles: persistedCategory?.uploadedFiles || [],
                 status: persistedCategory?.status || category.status
               };
-            })
+            }),
+            documents: ps.documents,
           };
         }
         return currentState;
