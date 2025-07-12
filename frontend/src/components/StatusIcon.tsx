@@ -1,24 +1,14 @@
-import React from 'react';
-import { CheckCircle, Circle, X, AlertTriangle } from 'lucide-react';
-
-type DocumentStatus = 'none' | 'approved' | 'warning' | 'error';
+import * as React from 'react';
+import { getStatusIcon } from '../utils/statusHelpers';
+import type { DocumentStatus } from '../utils/statusHelpers';
 
 interface StatusIconProps {
   status: DocumentStatus;
   className?: string;
 }
 
-export const StatusIcon: React.FC<StatusIconProps> = ({ status, className = "w-5 h-5" }) => {
-  switch (status) {
-    case 'approved':
-      return <CheckCircle className={`${className} text-green-600`} />;
-    case 'warning':
-      return <AlertTriangle className={`${className} text-yellow-600`} />;
-    case 'error':
-      return <X className={`${className} text-red-600`} />;
-    default:
-      return <Circle className={`${className} text-gray-400`} />;
-  }
+export const StatusIcon: React.FC<StatusIconProps> = ({ status, className }) => {
+  return getStatusIcon(status, className);
 };
 
 export type { DocumentStatus }; 

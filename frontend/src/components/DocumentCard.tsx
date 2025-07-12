@@ -1,8 +1,9 @@
 import React from 'react';
 import { Upload } from 'lucide-react';
 import { StatusIcon } from './StatusIcon';
+import { getStatusStyling, getStatusTooltip } from '../utils/statusHelpers';
 import { FileList } from './FileList';
-import type { DocumentStatus, DocumentCategory } from '../types/document';
+import type { DocumentCategory } from '../types/document';
 import type { Document } from '../types/api';
 
 interface DocumentCardProps {
@@ -11,11 +12,6 @@ interface DocumentCardProps {
   isDraggedOver: boolean;
   isDragging: boolean;
   hoveredStatusIcon: string | null;
-  statusStyling: {
-    background: string;
-    border: string;
-    iconBg: string;
-  };
   onCycleStatus: (categoryId: string) => void;
   onRemoveFile: (categoryId: string, fileName: string) => void;
   onOpenFileDialog: (categoryId: string) => void;
@@ -26,7 +22,6 @@ interface DocumentCardProps {
   fileInputRef: (el: HTMLInputElement | null) => void;
   onMouseEnterStatus: (categoryId: string) => void;
   onMouseLeaveStatus: () => void;
-  getStatusTooltip: (status: DocumentStatus) => { title: string; description: string; className: string };
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -35,7 +30,6 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   isDraggedOver,
   isDragging,
   hoveredStatusIcon,
-  statusStyling,
   onCycleStatus,
   onRemoveFile,
   onOpenFileDialog,
@@ -46,10 +40,10 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   fileInputRef,
   onMouseEnterStatus,
   onMouseLeaveStatus,
-  getStatusTooltip,
 }) => {
   const Icon = category.icon;
   const hasFiles = documents.length > 0;
+  const statusStyling = getStatusStyling(category.status);
 
   return (
     <div
@@ -59,22 +53,16 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
       onDrop={(e) => onDrop(e, category.id)}
     >
       <div
-        className={`
-          relative w-full p-4 rounded-xl border-2 transition-all duration-200 text-left
+        className={
+          `relative w-full p-4 rounded-xl border-2 transition-all duration-200 text-left
           ${statusStyling.background} ${statusStyling.border} shadow-md hover:shadow-lg
-          ${hasFiles ? 'min-h-[140px] pb-12' : 'pb-12'}
-        `}
+          ${hasFiles ? 'min-h-[140px] pb-12' : 'pb-12'}`
+        }
       >
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-lg flex-shrink-0 ${statusStyling.iconBg}`}>
-              <Icon className={
-                `w-5 h-5 ${
-                  category.status === 'approved' ? 'text-green-600' :
-                  category.status === 'warning' ? 'text-yellow-600' :
-                  category.status === 'error' ? 'text-red-600' : 'text-gray-600'
-                }`
-              } />
+              <Icon className="w-5 h-5 text-gray-600" />
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-gray-900 text-sm leading-tight">
