@@ -74,6 +74,7 @@ export const DocumentDetailPage: React.FC = () => {
             </p>
             <Button 
               variant="primary" 
+              className="border-none outline-none shadow-none focus:ring-0 focus:outline-none"
               onClick={(e) => {
                 e.stopPropagation();
                 fileInputRef.current?.click();
