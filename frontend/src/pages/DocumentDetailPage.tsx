@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDocumentStore } from '../stores/documentStore';
 import { Upload, ChevronLeft, CheckCircle, X, Clock, FileText } from 'lucide-react';
 import { Button } from '../components/Button';
+import { DragAndDropArea } from '../components/DragAndDropArea';
+import { useNotification } from '../components/NotificationProvider';
 
 export const DocumentDetailPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -12,7 +14,14 @@ export const DocumentDetailPage: React.FC = () => {
   const documents = getDocumentsByCategory(categoryId!);
   const uploadFiles = useDocumentStore(state => state.uploadFiles);
   const removeFile = useDocumentStore(state => state.removeFile);
+  const deleteDocument = useDocumentStore(state => state.deleteDocument);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { notify } = useNotification();
+  const fetchDocuments = useDocumentStore(state => state.fetchDocuments);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
 
   if (!category) {
     return (
@@ -20,8 +29,13 @@ export const DocumentDetailPage: React.FC = () => {
     );
   }
 
-  const handleFileUpload = (files: FileList | null) => {
-    uploadFiles(category.id, files);
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const { anySuccess, errors } = await uploadFiles(category.id, files);
+    if (anySuccess) {
+      notify('Files uploaded successfully!', 'success');
+    }
+    errors.forEach(msg => notify(msg, 'error'));
   };
 
   return (
@@ -45,11 +59,12 @@ export const DocumentDetailPage: React.FC = () => {
         </div>
 
         {/* Drag and Drop Area */}
-        <div 
+        <DragAndDropArea
+          onDropFiles={files => handleFileUpload(files)}
           className="mb-8 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
+          overlayContent={<span className="text-lg font-semibold text-white drop-shadow">Drop files to upload</span>}
         >
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <Upload className="w-8 h-8 text-green-600" />
             </div>
@@ -69,7 +84,7 @@ export const DocumentDetailPage: React.FC = () => {
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.xlsx,.xls"
             />
           </div>
-        </div>
+        </DragAndDropArea>
 
         {/* Uploaded Files */}
         {documents.length > 0 ? (
@@ -94,7 +109,14 @@ export const DocumentDetailPage: React.FC = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => removeFile(category.id, file.filename)}
+                    onClick={async () => {
+                      try {
+                        await deleteDocument(file.id);
+                        notify('Document deleted.', 'success');
+                      } catch (err) {
+                        notify('Failed to delete document.', 'error');
+                      }
+                    }}
                     className="text-gray-400 hover:text-red-600 transition-colors"
                   >
                     <X className="w-5 h-5" />
