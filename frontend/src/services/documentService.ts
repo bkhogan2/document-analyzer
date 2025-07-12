@@ -1,5 +1,6 @@
 import apiClient from './api';
 import type { UploadResponse, UploadOptions, UploadProgress, Document } from '../types/api';
+import { AxiosError } from 'axios';
 
 export class DocumentService {
   /**
@@ -9,7 +10,7 @@ export class DocumentService {
     try {
       const response = await apiClient.get<Document[]>(`/files/documents/${userId}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching documents:', error);
       throw error;
     }
@@ -32,8 +33,8 @@ export class DocumentService {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onUploadProgress: (progressEvent: any) => {
-        if (options?.onProgress && progressEvent.total) {
+      onUploadProgress: (progressEvent: unknown) => {
+        if (options?.onProgress && progressEvent instanceof ProgressEvent) {
           const progress: UploadProgress = {
             loaded: progressEvent.loaded,
             total: progressEvent.total,
@@ -52,9 +53,9 @@ export class DocumentService {
       );
       
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle validation errors specifically
-      if (error.response?.status === 400) {
+      if (error instanceof AxiosError && error.response?.status === 400) {
         const errorData = error.response.data;
         if (typeof errorData === 'string') {
           throw new Error(errorData);
@@ -85,8 +86,8 @@ export class DocumentService {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      onUploadProgress: (progressEvent: any) => {
-        if (options?.onProgress && progressEvent.total) {
+      onUploadProgress: (progressEvent: unknown) => {
+        if (options?.onProgress && progressEvent instanceof ProgressEvent) {
           const progress: UploadProgress = {
             loaded: progressEvent.loaded,
             total: progressEvent.total,
@@ -105,9 +106,9 @@ export class DocumentService {
       );
       
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle validation errors specifically
-      if (error.response?.status === 400) {
+      if (error instanceof AxiosError && error.response?.status === 400) {
         const errorData = error.response.data;
         if (typeof errorData === 'string') {
           throw new Error(errorData);
@@ -128,7 +129,7 @@ export class DocumentService {
   async deleteDocument(documentId: string): Promise<void> {
     try {
       await apiClient.delete(`/files/documents/${documentId}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting document:', error);
       throw error;
     }

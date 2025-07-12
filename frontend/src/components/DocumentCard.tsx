@@ -1,7 +1,7 @@
 import React from 'react';
 import { Upload } from 'lucide-react';
 import { StatusIcon } from './StatusIcon';
-import { getStatusStyling, getStatusTooltip } from '../utils/statusHelpers';
+import { getStatusStyling } from '../utils/statusHelpers';
 import { FileList } from './FileList';
 import type { DocumentCategory } from '../types/document';
 import type { Document } from '../types/api';
@@ -23,6 +23,9 @@ interface DocumentCardProps {
   fileInputRef: (el: HTMLInputElement | null) => void;
   onMouseEnterStatus: (categoryId: string) => void;
   onMouseLeaveStatus: () => void;
+  getStatusTooltip: (status: string) => { title: string; description: string; className: string } | null;
+  statusStyling: { background: string; border: string; iconBg: string };
+  onCardClick: ((categoryId: string) => void) | null;
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -41,28 +44,41 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   fileInputRef,
   onMouseEnterStatus,
   onMouseLeaveStatus,
+  getStatusTooltip,
+  statusStyling,
+  onCardClick,
 }) => {
   const Icon = category.icon;
   const hasFiles = documents.length > 0;
-  const statusStyling = getStatusStyling(category.status);
+  const styling = statusStyling || getStatusStyling(category.status);
 
   return (
     <div
-      className="relative group"
-      onDragOver={(e) => onDragOver(e, category.id)}
+      className="relative group cursor-pointer"
+      onClick={() => {
+        console.log('Card onClick', category.id);
+        if (onCardClick) onCardClick(category.id);
+      }}
+      onDragOver={(e) => {
+        console.log('Card onDragOver', category.id);
+        onDragOver(e, category.id);
+      }}
       onDragLeave={(e) => onDragLeave(e, category.id)}
-      onDrop={(e) => onDrop(e, category.id)}
+      onDrop={(e) => {
+        console.log('Card onDrop', category.id, e.dataTransfer.files);
+        onDrop(e, category.id);
+      }}
     >
       <div
         className={
           `relative w-full p-4 rounded-xl border-2 transition-all duration-200 text-left
-          ${statusStyling.background} ${statusStyling.border} shadow-md hover:shadow-lg
+          ${styling.background} ${styling.border} shadow-md hover:shadow-lg
           ${hasFiles ? 'min-h-[140px] pb-12' : 'pb-12'}`
         }
       >
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-lg flex-shrink-0 ${statusStyling.iconBg}`}>
+            <div className={`p-2 rounded-lg flex-shrink-0 ${styling.iconBg}`}>
               <Icon className="w-5 h-5 text-gray-600" />
             </div>
             <div className="min-w-0 flex-1">
@@ -89,7 +105,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
               <StatusIcon status={category.status} />
             </button>
             {/* Status Tooltip */}
-            {hoveredStatusIcon === category.id && (() => {
+            {hoveredStatusIcon === category.id && getStatusTooltip && (() => {
               const tooltip = getStatusTooltip(category.status);
               return (
                 <div className="absolute bottom-6 right-0 z-50 w-56 p-3 bg-white text-gray-800 text-xs rounded-lg shadow-xl border border-gray-200">
