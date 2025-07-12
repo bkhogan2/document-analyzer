@@ -13,7 +13,6 @@ export const DocumentDetailPage: React.FC = () => {
   const getDocumentsByCategory = useDocumentStore(state => state.getDocumentsByCategory);
   const documents = getDocumentsByCategory(categoryId!);
   const uploadFiles = useDocumentStore(state => state.uploadFiles);
-  const removeFile = useDocumentStore(state => state.removeFile);
   const deleteDocument = useDocumentStore(state => state.deleteDocument);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { notify } = useNotification();
@@ -62,9 +61,8 @@ export const DocumentDetailPage: React.FC = () => {
         <DragAndDropArea
           onDropFiles={files => handleFileUpload(files)}
           className="mb-8 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
-          overlayContent={<span className="text-lg font-semibold text-white drop-shadow">Drop files to upload</span>}
         >
-          <div className="flex flex-col items-center" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
+          <div className="flex flex-col items-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <Upload className="w-8 h-8 text-green-600" />
             </div>
@@ -74,7 +72,15 @@ export const DocumentDetailPage: React.FC = () => {
             <p className="text-gray-600 mb-4">
               Supported formats: PDF, Excel, Word, Images (JPG, PNG)
             </p>
-            <Button variant="primary">Browse Files</Button>
+            <Button 
+              variant="primary" 
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+            >
+              Browse Files
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -113,7 +119,7 @@ export const DocumentDetailPage: React.FC = () => {
                       try {
                         await deleteDocument(file.id);
                         notify('Document deleted.', 'success');
-                      } catch (err) {
+                      } catch {
                         notify('Failed to delete document.', 'error');
                       }
                     }}
