@@ -3,9 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { DocumentCategory, DocumentStatus } from '../types/document';
 import type { Document } from '../types/api';
 import { sbaDocumentCategories } from '../data/documentCategories';
-import { createUploadedFile } from '../utils/fileUtils';
 import { documentService } from '../services/documentService';
-import { useNotification } from '../components/NotificationProvider';
 
 interface DocumentStore {
   // State
@@ -27,7 +25,7 @@ interface DocumentStore {
   // Document actions
   fetchDocuments: (userId?: string) => Promise<void>;
   cycleStatus: (categoryId: string) => void;
-  uploadFiles: (categoryId: string, files: FileList | null) => void;
+  uploadFiles: (categoryId: string, files: FileList | null) => Promise<{ anySuccess: boolean; errors: string[] }>;
   removeFile: (categoryId: string, fileName: string) => void;
   deleteDocument: (documentId: string) => Promise<void>;
   uploadFileToCategory: (categoryId: string, file: File) => Promise<void>;
@@ -62,10 +60,10 @@ export const useDocumentStore = create<DocumentStore>()(
         try {
           const documents = await documentService.getUserDocuments(userId);
           set({ documents, isLoading: false });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Error fetching documents:', error);
           set({ 
-            error: error.message || 'Failed to fetch documents', 
+            error: (error as Error)?.message || 'Failed to fetch documents', 
             isLoading: false 
           });
         }
@@ -113,21 +111,22 @@ export const useDocumentStore = create<DocumentStore>()(
       },
       
       uploadFiles: async (categoryId: string, files: FileList | null) => {
-        if (!files || files.length === 0) return;
-        const notify = useNotification().notify;
+        if (!files || files.length === 0) return { anySuccess: false, errors: [] };
         let anySuccess = false;
+        const errors: string[] = [];
         for (const file of Array.from(files) as File[]) {
           try {
             await documentService.uploadFileToCategory(categoryId, file);
             anySuccess = true;
-          } catch (error: any) {
-            const reason = error?.message || 'Unknown error';
-            notify(`Failed to upload: ${file.name} – ${reason}`, 'error');
+          } catch (error: unknown) {
+            const reason = (error as Error)?.message || 'Unknown error';
+            errors.push(`Failed to upload: ${file.name} – ${reason}`);
           }
         }
         if (anySuccess) {
           await get().fetchDocuments();
         }
+        return { anySuccess, errors };
       },
       
       removeFile: (categoryId, fileName) => {
@@ -152,11 +151,11 @@ export const useDocumentStore = create<DocumentStore>()(
         });
         try {
           await documentService.deleteDocument(documentId);
-        } catch (error: any) {
+        } catch (error: unknown) {
           // Restore previous state if error
           set({
             documents: prevDocuments,
-            error: error.message || 'Failed to delete document'
+            error: (error as Error)?.message || 'Failed to delete document'
           });
         }
       },
@@ -176,13 +175,14 @@ export const useDocumentStore = create<DocumentStore>()(
         }))
       }),
       // Merge function to handle partial data
-      merge: (persistedState: any, currentState: DocumentStore) => {
-        if (persistedState && persistedState.categories) {
+      merge: (persistedState: unknown, currentState: DocumentStore) => {
+        if (persistedState && typeof persistedState === 'object' && 'categories' in persistedState) {
+          const ps = persistedState as { categories: DocumentCategory[] };
           return {
             ...currentState,
             categories: currentState.categories.map(category => {
-              const persistedCategory = persistedState.categories.find(
-                (p: any) => p.id === category.id
+              const persistedCategory = ps.categories.find(
+                (p: DocumentCategory) => p.id === category.id
               );
               return {
                 ...category,
