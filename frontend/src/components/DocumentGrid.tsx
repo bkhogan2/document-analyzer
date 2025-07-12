@@ -21,6 +21,7 @@ interface DocumentGridProps {
   getStatusStyling: (status: DocumentStatus) => { background: string; border: string; iconBg: string };
   getStatusTooltip: (status: DocumentStatus) => { title: string; description: string; className: string };
   getDocumentsByCategory: (categoryId: string) => Document[];
+  onCardClick: (categoryId: string) => void;
 }
 
 export const DocumentGrid: React.FC<DocumentGridProps> = ({
@@ -41,6 +42,7 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
   getStatusStyling,
   getStatusTooltip,
   getDocumentsByCategory,
+  onCardClick,
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -68,6 +70,7 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
             onMouseEnterStatus={onMouseEnterStatus}
             onMouseLeaveStatus={onMouseLeaveStatus}
             getStatusTooltip={getStatusTooltip}
+            onCardClick={onCardClick}
           />
         );
       })}

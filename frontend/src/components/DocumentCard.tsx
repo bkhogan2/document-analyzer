@@ -23,9 +23,9 @@ interface DocumentCardProps {
   fileInputRef: (el: HTMLInputElement | null) => void;
   onMouseEnterStatus: (categoryId: string) => void;
   onMouseLeaveStatus: () => void;
-  getStatusTooltip: (status: string) => { title: string; description: string; className: string } | null;
-  statusStyling: { background: string; border: string; iconBg: string };
-  onCardClick: ((categoryId: string) => void) | null;
+  getStatusTooltip?: (status: string) => { title: string; description: string; className: string };
+  statusStyling?: { background: string; border: string; iconBg: string };
+  onCardClick?: (categoryId: string) => void;
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -55,14 +55,8 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   return (
     <div
       className="relative group cursor-pointer"
-      onClick={() => {
-        console.log('Card onClick', category.id);
-        if (onCardClick) onCardClick(category.id);
-      }}
-      onDragOver={(e) => {
-        console.log('Card onDragOver', category.id);
-        onDragOver(e, category.id);
-      }}
+      onClick={() => onCardClick && onCardClick(category.id)}
+      onDragOver={(e) => onDragOver(e, category.id)}
       onDragLeave={(e) => onDragLeave(e, category.id)}
       onDrop={(e) => {
         console.log('Card onDrop', category.id, e.dataTransfer.files);
@@ -107,7 +101,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
             {/* Status Tooltip */}
             {hoveredStatusIcon === category.id && getStatusTooltip && (() => {
               const tooltip = getStatusTooltip(category.status);
-              return (
+              return tooltip ? (
                 <div className="absolute bottom-6 right-0 z-50 w-56 p-3 bg-white text-gray-800 text-xs rounded-lg shadow-xl border border-gray-200">
                   <div className="absolute -bottom-1 right-3 w-2 h-2 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
                   <div>
@@ -115,7 +109,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
                     <div className="text-gray-600">{tooltip.description}</div>
                   </div>
                 </div>
-              );
+              ) : null;
             })()}
           </div>
         </div>
