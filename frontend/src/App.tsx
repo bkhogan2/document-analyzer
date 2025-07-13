@@ -1,31 +1,17 @@
-import React, { useEffect } from 'react';
-import { Sidebar } from './components/Sidebar';
+import { useEffect } from 'react';
+import { DynamicSidebar } from './components/DynamicSidebar';
 import { Header } from './components/Header';
-import { Routes, Route, Outlet, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { DocumentCollectionPage } from './pages/DocumentCollectionPage';
 import { DocumentDetailPage } from './pages/DocumentDetailPage';
+import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
-
-// Placeholder for future application detail page
-const ApplicationDetailPage: React.FC = () => {
-  const { type, id } = useParams();
-  return (
-    <div className="flex-1 px-8 py-12">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-4">Application Detail</h1>
-        <p>Type: {type}</p>
-        <p>ID: {id}</p>
-        <p>This is a placeholder for the application detail page.</p>
-      </div>
-    </div>
-  );
-};
 
 function Layout() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar />
+      <DynamicSidebar />
       <div className="flex-1 flex flex-col">
         <Header />
         <Outlet />
@@ -68,13 +54,13 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<DocumentCollectionPage />} />
+        <Route index element={<Navigate to="/applications" replace />} />
+        <Route path="documents" element={<DocumentLibraryPage />} />
         <Route path="documents/:categoryId" element={<DocumentDetailPage />} />
         {/* Applications routing */}
         <Route path="applications">
-          <Route index element={<Navigate to="/applications/sba" replace />} />
-          <Route path=":type" element={<ApplicationsPage />} />
-          <Route path=":type/:id" element={<ApplicationDetailPage />} />
+          <Route index element={<ApplicationsPage />} />
+          <Route path=":type/:id" element={<DocumentCollectionPage />} />
         </Route>
       </Route>
     </Routes>
