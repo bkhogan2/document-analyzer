@@ -8,6 +8,7 @@ import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
 import ApplicationHomePage from './pages/ApplicationHomePage';
+import ApplicationFormStepPage from './pages/ApplicationFormStepPage';
 
 function Layout() {
   return (
@@ -65,6 +66,8 @@ function App() {
           <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
           <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
         </Route>
+        <Route path="applications/new" element={<ApplicationFormStepPage />} />
+        <Route path="applications/new/:formStep" element={<ApplicationFormStepPage />} />
       </Route>
     </Routes>
   );
