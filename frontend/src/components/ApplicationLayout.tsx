@@ -9,7 +9,7 @@ interface ApplicationLayoutProps {
 
 export const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ children }) => {
   const { 
-    applicationId, 
+    applicationId: currentApplicationId, 
     sections, 
     currentSectionIndex,
     setCurrentSection
@@ -18,7 +18,7 @@ export const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ children }
   const location = useLocation();
 
   // Only show stepper if we have an active application
-  const hasActiveApplication = applicationId !== null;
+  const hasActiveApplication = currentApplicationId !== null;
 
   // Calculate section progress for the stepper
   const sectionProgress = sections.map(section => section.progress);
@@ -27,8 +27,12 @@ export const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ children }
   const handleSectionClick = (sectionIndex: number) => {
     setCurrentSection(sectionIndex);
     // If not already on the wizard, navigate to it
-    if (!location.pathname.includes('/applications/new')) {
-      navigate('/applications/new');
+    if (currentApplicationId && sections.length > 0) {
+      const appType = sections[0].id.split('-')[0] || 'sba'; // fallback if needed
+      const wizardPath = `/applications/${appType}/${currentApplicationId}/steps`;
+      if (!location.pathname.startsWith(wizardPath)) {
+        navigate(wizardPath);
+      }
     }
   };
 

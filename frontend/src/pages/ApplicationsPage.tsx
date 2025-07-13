@@ -77,7 +77,11 @@ const ApplicationsPage: React.FC = () => {
               Manage and track all your {appType.toUpperCase()} loan applications
             </p>
           </div>
-          <Button variant="primary" className="flex items-center space-x-2" onClick={() => { console.log('Start New Application clicked'); navigate('/applications/new'); }}>
+          <Button variant="primary" className="flex items-center space-x-2" onClick={() => { 
+            // Generate a new application ID in the same format as existing ones
+            const newId = `25QL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+            navigate(`/applications/${appType}/${newId}/steps`);
+          }}>
             <Plus className="w-5 h-5" />
             <span>Start New Application</span>
           </Button>

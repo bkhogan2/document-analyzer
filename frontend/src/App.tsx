@@ -83,8 +83,8 @@ function App() {
           <Route path=":type/:id/home" element={<ApplicationHomePage />} />
           <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
           <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
+          <Route path=":type/:id/steps" element={<RHFApplicationWizard />} />
         </Route>
-        <Route path="applications/new" element={<RHFApplicationWizard />} />
       </Route>
     </Routes>
   );
