@@ -7,7 +7,7 @@ import type { ApplicationType } from '../constants/applicationTypes';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 
 // Minimal mock data for applications with realistic IDs
-const mockApplications = [
+export const mockApplications = [
   {
     id: '25QL-LZ29V',
     type: 'sba',
@@ -61,7 +61,7 @@ const ApplicationsPage: React.FC = () => {
   const appType: ApplicationType = (type && APPLICATION_TYPES.includes(type as ApplicationType) ? type : APPLICATION_TYPES[0]) as ApplicationType;
 
   const handleViewApplication = (application: { id: string; type: string }) => {
-    navigate(`/applications/${application.type}/${application.id}`);
+    navigate(`/applications/${application.type}/${application.id}/home`);
   };
 
   return (

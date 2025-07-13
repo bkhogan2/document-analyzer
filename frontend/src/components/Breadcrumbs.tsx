@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import type { ApplicationType } from '../constants/applicationTypes';
+import { sbaDocumentCategories } from '../data/documentCategories';
 
 interface BreadcrumbItem {
   label: string;
@@ -13,24 +14,47 @@ export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
   const params = useParams<{ type?: ApplicationType; id?: string; categoryId?: string }>();
   
+  const getCategoryTitle = (categoryId?: string) => {
+    if (!categoryId) return '';
+    const cat = sbaDocumentCategories.find(c => c.id === categoryId);
+    return cat ? cat.title : categoryId;
+  };
+
   const getBreadcrumbs = (): BreadcrumbItem[] => {
     const pathname = location.pathname;
     const breadcrumbs: BreadcrumbItem[] = [
       { label: 'Home', to: '/' }
     ];
 
-    // Applications context
+    // Application context (document collection and detail)
     if (pathname.startsWith('/applications/')) {
       breadcrumbs.push({ label: 'Applications', to: '/applications' });
-      if (params.id) {
+      if (params.id && params.type) {
         breadcrumbs.push({ 
-          label: params.id || '',
-          to: `/applications/${params.type}/${params.id}`,
-          current: true 
+          label: params.id, 
+          to: `/applications/${params.type}/${params.id}/home` 
         });
+        // Document collection
+        if (pathname.includes('/documents')) {
+          breadcrumbs.push({
+            label: 'Documents',
+            to: `/applications/${params.type}/${params.id}/documents`,
+            current: !params.categoryId
+          });
+          // Document detail
+          if (params.categoryId) {
+            breadcrumbs.push({
+              label: getCategoryTitle(params.categoryId),
+              current: true
+            });
+          }
+        } else {
+          // On home page
+          breadcrumbs[breadcrumbs.length - 1].current = true;
+        }
       }
     }
-    // Documents context
+    // Documents context (global library)
     else if (pathname.startsWith('/documents/')) {
       breadcrumbs.push({ label: 'Document Library', to: '/documents' });
       if (params.categoryId) {

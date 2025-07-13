@@ -1,14 +1,14 @@
 import React, { useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDocumentStore } from '../stores/documentStore';
-import { Upload, ChevronLeft, CheckCircle, X, Clock, FileText } from 'lucide-react';
+import { Upload, CheckCircle, X, Clock, FileText } from 'lucide-react';
 import { Button } from '../components/Button';
 import { DragAndDropArea } from '../components/DragAndDropArea';
 import { useNotification } from '../components/NotificationProvider';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export const DocumentDetailPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const navigate = useNavigate();
   const category = useDocumentStore(state => state.categories.find(cat => cat.id === categoryId));
   const getDocumentsByCategory = useDocumentStore(state => state.getDocumentsByCategory);
   const documents = getDocumentsByCategory(categoryId!);
@@ -40,15 +40,9 @@ export const DocumentDetailPage: React.FC = () => {
   return (
     <div className="flex-1 px-8 py-12">
       <div className="max-w-4xl mx-auto">
+        <Breadcrumbs />
         {/* Header */}
         <div className="mb-8">
-          <button 
-            onClick={() => navigate('/')} // Go back to collection page
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4"
-          >
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            Back to Documents
-          </button>
           <h1 className="text-3xl font-semibold text-gray-900 mb-2">
             {category.title}
           </h1>
