@@ -17,6 +17,22 @@ const ApplicationHomePage: React.FC = () => {
     return currentId ? state.applications[currentId] : undefined;
   });
 
+  // Extract primary applicant info from formData.welcome
+  const welcome = (typeof currentApp?.formData?.welcome === 'object' && currentApp?.formData?.welcome !== null)
+    ? currentApp.formData.welcome as Record<string, unknown>
+    : {};
+  const applicantName = typeof welcome.applicantName === 'string' ? welcome.applicantName : '';
+  const applicantEmail = typeof welcome.applicantEmail === 'string' ? welcome.applicantEmail : '';
+  const streetAddress = typeof welcome.streetAddress === 'string' ? welcome.streetAddress : '';
+  const city = typeof welcome.city === 'string' ? welcome.city : '';
+  const stateVal = typeof welcome.state === 'string' ? welcome.state : '';
+  const zip = typeof welcome.zip === 'string' ? welcome.zip : '';
+  const address = [streetAddress, city, stateVal, zip].filter(Boolean).join(', ');
+  // Get initials for avatar
+  const initials = applicantName
+    ? applicantName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : '';
+
   // Initialize application when component mounts
   useEffect(() => {
     if (id && type) {
@@ -65,18 +81,18 @@ const ApplicationHomePage: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="font-semibold text-green-600">BH</span>
+                  <span className="font-semibold text-green-600">{initials}</span>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Brian Hogan</p>
+                  <p className="font-medium text-gray-900">{applicantName}</p>
                   <p className="text-sm text-gray-600">Primary Applicant</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <span>bkhogan2@gmail.com</span>
+                <span>{applicantEmail}</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <span>1140 West Palm Street, San Diego, CA 92103</span>
+                <span>{address}</span>
               </div>
             </div>
           </div>
