@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface ApplicationStore {
-  formData: Record<string, any>;
-  setFormData: (step: string, data: any) => void;
+  formData: Record<string, unknown>;
+  setFormData: (step: string, data: Record<string, unknown>) => void;
 }
 
 export const useApplicationStore = create<ApplicationStore>()(
@@ -14,7 +14,10 @@ export const useApplicationStore = create<ApplicationStore>()(
         set((state) => ({
           formData: {
             ...state.formData,
-            [step]: { ...state.formData[step], ...data },
+            [step]: { 
+              ...(typeof state.formData[step] === 'object' && state.formData[step] !== null ? state.formData[step] as Record<string, unknown> : {}), 
+              ...data 
+            },
           },
         })),
     }),

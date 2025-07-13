@@ -8,7 +8,7 @@ import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
 import ApplicationHomePage from './pages/ApplicationHomePage';
-import ApplicationFormStepPage from './pages/ApplicationFormStepPage';
+import RHFApplicationWizard from './pages/RHFApplicationWizard';
 
 function Layout() {
   return (
@@ -66,8 +66,11 @@ function App() {
           <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
           <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
         </Route>
-        <Route path="applications/new" element={<ApplicationFormStepPage />} />
-        <Route path="applications/new/:formStep" element={<ApplicationFormStepPage />} />
+        {/* Replace old wizard with new RHF wizard */}
+        <Route path="applications/new" element={<RHFApplicationWizard />} />
+        {/* Remove old wizard routes: <Route path="applications/new/:formStep" element={<ApplicationFormStepPage />} /> */}
+        {/* RHF Wizard test route can be removed if desired */}
+        {/* <Route path="applications/rhf-test" element={<RHFApplicationWizard />} /> */}
       </Route>
     </Routes>
   );
