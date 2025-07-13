@@ -77,7 +77,7 @@ const ApplicationsPage: React.FC = () => {
               Manage and track all your {appType.toUpperCase()} loan applications
             </p>
           </div>
-          <Button variant="primary" className="flex items-center space-x-2">
+          <Button variant="primary" className="flex items-center space-x-2" onClick={() => { console.log('Start New Application clicked'); navigate('/applications/new/step-1'); }}>
             <Plus className="w-5 h-5" />
             <span>Start New Application</span>
           </Button>
