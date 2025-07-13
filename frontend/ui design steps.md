@@ -1,29 +1,38 @@
-Suggested Order of Implementation
+Suggested Order of Implementation (Foundational Approach)
 
+1. Persistent, Context-Aware Stepper
+   - Move the stepper to a layout component that wraps all application-related pages.
+   - Ensure the stepper is always visible when working on an application (wizard, uploads, review, etc.).
 
-Move the stepper to the top and make it persistent.
+2. Centralized Application State
+   - Use a global store (e.g., Zustand) to track current step, section, and completion status.
+   - Persist state to localStorage or backend for session continuity.
 
-Next Steps for Building Out the Stepper
-1. Partial Fill for Sections
-Current: Each section is either filled or not.
-Next: Allow each section’s segment to fill proportionally as the user completes steps within that section.
-Pass a sectionProgress array (values 0–1 for each section) instead of just booleans.
-The bar segment for each section fills according to its progress.
-2. Wire Up to Real Step State
-Connect the stepper’s progress to your actual form state:
-Track which step the user is on within each section.
-Calculate progress for each section and pass it to the stepper.
-3. Clickable Sections (Optional)
-Allow users to click on a section to jump to it (with validation to prevent skipping required steps).
-4. Visual Tweaks
-Add subtle animations for progress.
-Highlight the current section more distinctly.
-Add tooltips or helper text if needed.
+3. Composable Step/Section Model
+   - Define steps/sections in a config object/array with metadata (title, fields, validation, etc.).
+   - Render wizard and stepper dynamically from this config for easy updates.
 
+4. Section Progress Calculation
+   - Calculate and display partial progress for each section (e.g., 2/3 steps complete).
+   - Pass an array of progress values (0–1) to the stepper for proportional fills.
 
+5. Navigation & Validation
+   - Allow users to click on completed/current sections in the stepper.
+   - Prevent skipping ahead unless validation passes; show clear feedback if blocked.
 
-Refactor one step/page to use the new full-page layout (no card).
-Implement yes/no button questions for that step.
-Update navigation buttons for consistency.
-Repeat for other steps.
-Design and implement the review page last.
+6. Integration with Document Uploads & Other Processes
+   - Treat uploads, reviews, and other processes as steps/sections in the config.
+   - Stepper reflects progress through all parts of the application process.
+
+7. Visual & UX Enhancements
+   - Add subtle animations for progress.
+   - Highlight the current section.
+   - Add tooltips or helper text as needed.
+   - Ensure responsive and accessible design.
+
+8. Future-Proofing
+   - Key all state by application ID to support multiple applications and resuming.
+   - Design for easy extension to admin/partner views.
+
+Optional: Clickable Sections
+   - Allow users to jump to sections via the stepper, with validation.
