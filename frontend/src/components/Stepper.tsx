@@ -30,7 +30,7 @@ export const Stepper: React.FC<StepperProps> = ({
   };
 
   return (
-    <div className="w-full px-8 pt-1 pb-1 bg-gray-50">
+    <div className="w-full px-8 pt-1 pb-1">
       {/* Segmented Progress Bar */}
       <div className="flex w-full h-1 gap-0.5">
         {sections.map((section, idx) => (
