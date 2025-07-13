@@ -1,24 +1,41 @@
 import React from 'react';
-
-interface StepperSection {
-  label: string;
-  stepCount: number;
-}
+import { useApplicationStore } from '../stores/applicationStore';
+import type { ApplicationSection } from '../stores/applicationStore';
 
 interface StepperProps {
-  sections: StepperSection[];
+  sections: ApplicationSection[];
   sectionProgress: number[]; // 0-1 for each section
   currentSection: number; // index of active section
+  onSectionClick?: (sectionIndex: number) => void; // Optional click handler
 }
 
-export const Stepper: React.FC<StepperProps> = ({ sections, sectionProgress, currentSection }) => {
+export const Stepper: React.FC<StepperProps> = ({ 
+  sections, 
+  sectionProgress, 
+  currentSection,
+  onSectionClick 
+}) => {
+  const { setCurrentSection } = useApplicationStore();
+
+  const handleSectionClick = (sectionIndex: number) => {
+    // Only allow clicking on completed sections or the current section
+    const section = sections[sectionIndex];
+    const canNavigate = section.isCompleted || sectionIndex === currentSection;
+    
+    if (canNavigate && onSectionClick) {
+      onSectionClick(sectionIndex);
+    } else if (canNavigate) {
+      setCurrentSection(sectionIndex);
+    }
+  };
+
   return (
     <div className="w-full px-8 pt-1 pb-1 bg-gray-50">
       {/* Segmented Progress Bar */}
       <div className="flex w-full h-1 gap-0.5">
         {sections.map((section, idx) => (
           <div
-            key={section.label}
+            key={section.id}
             className="bg-gray-200 rounded-[0.05rem] overflow-hidden"
             style={{ flexGrow: section.stepCount, minWidth: 0 }}
           >
@@ -29,19 +46,27 @@ export const Stepper: React.FC<StepperProps> = ({ sections, sectionProgress, cur
           </div>
         ))}
       </div>
+      
       {/* Section Labels */}
       <div className="flex justify-between mt-0.5">
-        {sections.map((section, idx) => (
-          <div
-            key={section.label}
-            className={`text-[10px] text-left font-normal ${
-              idx === currentSection ? 'text-black font-semibold' : 'text-gray-500'
-            }`}
-            style={{ flex: section.stepCount }}
-          >
-            {section.label}
-          </div>
-        ))}
+        {sections.map((section, idx) => {
+          const isCurrent = idx === currentSection;
+          const canClick = section.isCompleted || isCurrent;
+          
+          return (
+            <div
+              key={section.id}
+              className={`text-[10px] text-left font-normal transition-colors duration-200 ${
+                isCurrent ? 'text-black font-semibold' : 'text-gray-500'
+              } ${canClick ? 'cursor-pointer hover:text-blue-600' : 'cursor-default'}`}
+              style={{ flex: section.stepCount }}
+              onClick={() => handleSectionClick(idx)}
+              title={canClick ? `Click to go to ${section.label}` : `${section.label} (not yet available)`}
+            >
+              {section.label}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

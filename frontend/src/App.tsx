@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { DynamicSidebar } from './components/DynamicSidebar';
 import { Header } from './components/Header';
+import { ApplicationLayout } from './components/ApplicationLayout';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { DocumentCollectionPage } from './pages/DocumentCollectionPage';
 import { DocumentDetailPage } from './pages/DocumentDetailPage';
@@ -17,6 +18,20 @@ function Layout() {
       <div className="flex-1 flex flex-col">
         <Header />
         <Outlet />
+      </div>
+    </div>
+  );
+}
+
+function ApplicationLayoutWrapper() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      <DynamicSidebar />
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <ApplicationLayout>
+          <Outlet />
+        </ApplicationLayout>
       </div>
     </div>
   );
@@ -58,19 +73,18 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/applications" replace />} />
         <Route path="documents" element={<DocumentLibraryPage />} />
-        {/* Applications routing */}
+        <Route path="applications" element={<ApplicationsPage />} />
+      </Route>
+      
+      {/* Application-specific routes with persistent stepper */}
+      <Route path="/" element={<ApplicationLayoutWrapper />}>
         <Route path="applications">
-          <Route index element={<ApplicationsPage />} />
           <Route path=":type/:id" element={<Navigate to="/applications/:type/:id/home" replace />} />
           <Route path=":type/:id/home" element={<ApplicationHomePage />} />
           <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
           <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
         </Route>
-        {/* Replace old wizard with new RHF wizard */}
         <Route path="applications/new" element={<RHFApplicationWizard />} />
-        {/* Remove old wizard routes: <Route path="applications/new/:formStep" element={<ApplicationFormStepPage />} /> */}
-        {/* RHF Wizard test route can be removed if desired */}
-        {/* <Route path="applications/rhf-test" element={<RHFApplicationWizard />} /> */}
       </Route>
     </Routes>
   );

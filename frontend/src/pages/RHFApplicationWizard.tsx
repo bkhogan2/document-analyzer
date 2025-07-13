@@ -1,43 +1,7 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Stepper as StyledStepper } from '../components/Stepper';
+import { useApplicationStore } from '../stores/applicationStore';
 import { Button } from '../components/Button';
-
-// Section definitions (copied from ApplicationFormStepPage)
-const sections = [
-  { label: 'Welcome', stepCount: 1 },
-  { label: 'Loan Information', stepCount: 2 },
-  { label: 'Business Info', stepCount: 3 },
-  { label: 'Owner Information', stepCount: 2 },
-  { label: 'Certification', stepCount: 1 },
-  { label: 'Pre-Screen Questions', stepCount: 2 },
-  { label: 'Documents', stepCount: 2 },
-  { label: 'Review', stepCount: 1 },
-];
-
-// Map each wizard step index to a section index
-const stepToSection = [
-  0, // Welcome
-  1, 1, // Loan Information
-  2, 2, 2, // Business Info
-  3, 3, // Owner Information
-  4, // Certification
-  5, 5, // Pre-Screen Questions
-  6, 6, // Documents
-  7 // Review
-];
-
-// Step titles for each step
-const stepTitles = [
-  'Welcome',
-  'Loan Information (1)', 'Loan Information (2)',
-  'Business Info (1)', 'Business Info (2)', 'Business Info (3)',
-  'Owner Information (1)', 'Owner Information (2)',
-  'Certification',
-  'Pre-Screen Questions (1)', 'Pre-Screen Questions (2)',
-  'Documents (1)', 'Documents (2)',
-  'Review'
-];
 
 // TurboTax-style placeholder step
 function PlaceholderStep({ stepNumber, sectionLabel }: { stepNumber: number; sectionLabel: string }) {
@@ -97,59 +61,82 @@ function WizardFooter({
 }
 
 export default function RHFApplicationWizard() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const {
+    currentStepIndex,
+    steps,
+    sections,
+    currentSectionIndex,
+    setCurrentStep,
+    markStepCompleted,
+    setApplicationId,
+    setApplicationType
+  } = useApplicationStore();
+
+  // Initialize application when component mounts
+  useEffect(() => {
+    // Generate a unique application ID if none exists
+    if (!useApplicationStore.getState().applicationId) {
+      const newId = `app_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      setApplicationId(newId);
+      setApplicationType('sba-loan');
+    }
+  }, [setApplicationId, setApplicationType]);
 
   // Set up RHF context
   const methods = useForm<Record<string, unknown>>({
     defaultValues: {}
   });
 
-  // Calculate section progress for the styled Stepper
-  const sectionProgress = sections.map((_, sectionIdx) => {
-    // Find all step indices for this section
-    const stepIndices = stepToSection
-      .map((secIdx, i) => (secIdx === sectionIdx ? i : -1))
-      .filter(i => i !== -1);
-    if (stepIndices.length === 0) return 0;
-    // Count how many steps in this section are completed (currentStep > step index)
-    const completed = stepIndices.filter(i => currentStep > i).length;
-    // If we're currently in this section, fill partially
-    if (stepIndices.includes(currentStep)) {
-      return (completed + 1) / stepIndices.length;
-    }
-    // If all steps in this section are before currentStep, fill fully
-    if (completed === stepIndices.length) return 1;
-    // Otherwise, not started
-    return 0;
-  });
-  const currentSection = stepToSection[currentStep] || 0;
+  const currentStep = steps[currentStepIndex];
+  const currentSection = sections[currentSectionIndex];
+  const stepCount = steps.length;
 
-  const next = () => setCurrentStep((s) => Math.min(s + 1, stepTitles.length - 1));
-  const back = () => setCurrentStep((s) => Math.max(s - 1, 0));
+  const next = () => {
+    // Mark current step as completed
+    if (currentStep) {
+      markStepCompleted(currentStep.id, true);
+    }
+    
+    // Move to next step
+    const nextStepIndex = Math.min(currentStepIndex + 1, stepCount - 1);
+    setCurrentStep(nextStepIndex);
+  };
+
+  const back = () => {
+    const prevStepIndex = Math.max(currentStepIndex - 1, 0);
+    setCurrentStep(prevStepIndex);
+  };
 
   const onSubmit = () => {
     methods.handleSubmit((data: Record<string, unknown>) => {
+      // Mark final step as completed
+      if (currentStep) {
+        markStepCompleted(currentStep.id, true);
+      }
+      
       alert(JSON.stringify(data, null, 2));
     })();
   };
 
+  if (!currentStep || !currentSection) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <FormProvider {...methods}>
       <div className="flex flex-col min-h-[70vh]">
-        {/* Stepper is now full width */}
-        <StyledStepper sections={sections} sectionProgress={sectionProgress} currentSection={currentSection} />
         {/* Form content is constrained */}
         <form className="flex-1 max-w-lg mx-auto w-full flex flex-col">
           <div className="flex-1 flex flex-col justify-center">
             <PlaceholderStep
-              stepNumber={currentStep + 1}
-              sectionLabel={sections[currentSection].label}
+              stepNumber={currentStepIndex + 1}
+              sectionLabel={currentSection.label}
             />
           </div>
         </form>
         <WizardFooter
-          currentStep={currentStep}
-          stepCount={stepTitles.length}
+          currentStep={currentStepIndex}
+          stepCount={stepCount}
           onBack={back}
           onNext={next}
           onSubmit={onSubmit}
