@@ -7,6 +7,7 @@ import { DocumentDetailPage } from './pages/DocumentDetailPage';
 import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
+import ApplicationHomePage from './pages/ApplicationHomePage';
 
 function Layout() {
   return (
@@ -56,11 +57,13 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/applications" replace />} />
         <Route path="documents" element={<DocumentLibraryPage />} />
-        <Route path="documents/:categoryId" element={<DocumentDetailPage />} />
         {/* Applications routing */}
         <Route path="applications">
           <Route index element={<ApplicationsPage />} />
-          <Route path=":type/:id" element={<DocumentCollectionPage />} />
+          <Route path=":type/:id" element={<Navigate to="/applications/:type/:id/home" replace />} />
+          <Route path=":type/:id/home" element={<ApplicationHomePage />} />
+          <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
+          <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
         </Route>
       </Route>
     </Routes>

@@ -108,7 +108,7 @@ export const DocumentCollectionPage: React.FC = () => {
   const { notify } = useNotification();
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const navigate = useNavigate();
-  const { id: applicationId } = useParams();
+  const { id: applicationId, type: applicationType } = useParams();
 
   useEffect(() => {
     fetchDocuments();
@@ -144,7 +144,9 @@ export const DocumentCollectionPage: React.FC = () => {
 
   // Handler to navigate to detail page
   const handleCardClick = (categoryId: string) => {
-    navigate(`/documents/${categoryId}`);
+    if (applicationType && applicationId) {
+      navigate(`/applications/${applicationType}/${applicationId}/documents/${categoryId}`);
+    }
   };
 
   if (isLoading) {
@@ -176,28 +178,32 @@ export const DocumentCollectionPage: React.FC = () => {
 
   return (
     <div className="flex-1 px-8 py-12">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <Breadcrumbs />
         <PageHeader />
-        <DocumentGrid
-          categories={visibleItems}
-          hoveredStatusIcon={hoveredStatusIcon}
-          onCycleStatus={cycleStatus}
-          onRemoveFile={(_categoryId, fileNameOrId) => deleteDocument(fileNameOrId)}
-          onOpenFileDialog={openFileDialog}
-          onFileUpload={handleFileUpload}
-          fileInputRefs={fileInputRefs}
-          onMouseEnterStatus={setHoveredStatusIcon}
-          onMouseLeaveStatus={() => setHoveredStatusIcon(null)}
-          getStatusStyling={getStatusStyling}
-          getStatusTooltip={getStatusTooltip}
-          getDocumentsByCategory={getDocumentsByCategory}
-          onCardClick={handleCardClick}
-        />
+        <div className="mb-12">
+          <DocumentGrid
+            categories={visibleItems}
+            hoveredStatusIcon={hoveredStatusIcon}
+            onCycleStatus={cycleStatus}
+            onRemoveFile={(_categoryId, fileNameOrId) => deleteDocument(fileNameOrId)}
+            onOpenFileDialog={openFileDialog}
+            onFileUpload={handleFileUpload}
+            fileInputRefs={fileInputRefs}
+            onMouseEnterStatus={setHoveredStatusIcon}
+            onMouseLeaveStatus={() => setHoveredStatusIcon(null)}
+            getStatusStyling={getStatusStyling}
+            getStatusTooltip={getStatusTooltip}
+            getDocumentsByCategory={getDocumentsByCategory}
+            onCardClick={handleCardClick}
+          />
+        </div>
         {!showMore && categoriesWithRealStatuses.length > 8 && (
           <ShowMoreButton onClick={() => setShowMore(true)} />
         )}
-        <FooterMessage />
+        <div className="mb-8">
+          <FooterMessage />
+        </div>
         <FooterButtons />
       </div>
     </div>
