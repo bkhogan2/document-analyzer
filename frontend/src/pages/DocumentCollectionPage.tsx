@@ -7,6 +7,7 @@ import { FooterMessage } from '../components/FooterMessage';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { getStatusStyling, getStatusTooltip } from '../utils/statusUtils';
 import { useDocumentStore } from '../stores/documentStore';
+import { useApplicationStore } from '../stores/applicationStore';
 import { useNotification } from '../components/NotificationProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -90,6 +91,9 @@ const mockDocuments = [
 ];
 
 export const DocumentCollectionPage: React.FC = () => {
+  const { id: applicationId, type: applicationType } = useParams();
+  const { selectApplication } = useApplicationStore();
+  
   const {
     categories,
     isLoading,
@@ -108,7 +112,13 @@ export const DocumentCollectionPage: React.FC = () => {
   const { notify } = useNotification();
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const navigate = useNavigate();
-  const { id: applicationId, type: applicationType } = useParams();
+
+  // Initialize application when component mounts
+  useEffect(() => {
+    if (applicationId && applicationType) {
+      selectApplication(applicationId, applicationType);
+    }
+  }, [applicationId, applicationType, selectApplication]);
 
   useEffect(() => {
     fetchDocuments();

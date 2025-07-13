@@ -39,7 +39,7 @@ export interface ApplicationStoreState {
   markStepCompleted: (stepId: string, completed: boolean) => void;
   markSectionCompleted: (sectionId: string, completed: boolean) => void;
   setFormData: (step: string, data: Record<string, unknown>) => void;
-  resetApplication: (id: string) => void;
+  resetApplication: (id: string, type?: string) => void;
 }
 
 const defaultSections: ApplicationSection[] = [
@@ -79,6 +79,11 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       selectApplication: (id, type) => {
         console.log('[store] selectApplication', { id, type });
         const state = get();
+        console.log('[store] Current state:', {
+          currentApplicationId: state.currentApplicationId,
+          applications: Object.keys(state.applications),
+          selectedApp: state.applications[id]
+        });
         if (state.currentApplicationId === id && state.applications[id]) return;
         // If not initialized, initialize
         if (!state.applications[id]) {
@@ -272,6 +277,9 @@ export const useApplicationStore = create<ApplicationStoreState>()(
     }),
     {
       name: 'application-store',
+      onRehydrateStorage: () => (state) => {
+        console.log('[store] Rehydrated state:', state);
+      },
     }
   )
 ); 

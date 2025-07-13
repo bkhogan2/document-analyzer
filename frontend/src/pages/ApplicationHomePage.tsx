@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useApplicationStore } from '../stores/applicationStore';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { DragAndDropArea } from '../components/DragAndDropArea';
 import { Upload } from 'lucide-react';
 import { Button } from '../components/Button';
 
 const ApplicationHomePage: React.FC = () => {
+  const { type, id } = useParams<{ type: string; id: string }>();
+  const navigate = useNavigate();
+  const { selectApplication } = useApplicationStore();
+
+  // Get current application state
+  const currentApp = useApplicationStore(state => {
+    const currentId = state.currentApplicationId;
+    return currentId ? state.applications[currentId] : undefined;
+  });
+
+  // Initialize application when component mounts
+  useEffect(() => {
+    if (id && type) {
+      selectApplication(id, type);
+    }
+  }, [id, type, selectApplication]);
+
   // Placeholder values for document progress
   const documentsCompleted = 3;
   const totalDocuments = 10;
@@ -23,6 +42,16 @@ const ApplicationHomePage: React.FC = () => {
   const openFileDialog = () => {
     fileInputRef.current?.click();
   };
+
+  const handleContinueApplication = () => {
+    if (id && type) {
+      navigate(`/applications/${type}/${id}/steps`);
+    }
+  };
+
+  // Get current step info for display
+  const currentStepIndex = currentApp?.currentStepIndex || 0;
+  const totalSteps = currentApp?.steps?.length || 8;
 
   return (
     <div className="flex-1 px-8 py-12">
@@ -56,13 +85,13 @@ const ApplicationHomePage: React.FC = () => {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Continue Application</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Continue from step 1 of 8
+                Continue from step {currentStepIndex + 1} of {totalSteps}
               </p>
             </div>
             <Button 
               variant="primary" 
               className="w-full mt-4"
-              disabled
+              onClick={handleContinueApplication}
             >
               Continue Application
             </Button>

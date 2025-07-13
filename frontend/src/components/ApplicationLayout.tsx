@@ -3,11 +3,11 @@ import { Stepper } from './Stepper';
 import { useApplicationStore } from '../stores/applicationStore';
 
 export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Get current application state
-  const currentApplicationId = useApplicationStore(state => state.currentApplicationId);
-  const currentApp = useApplicationStore(state => 
-    currentApplicationId ? state.applications[currentApplicationId] : undefined
-  );
+  // Get current application state using stable selectors
+  const currentApp = useApplicationStore(state => {
+    const currentId = state.currentApplicationId;
+    return currentId ? state.applications[currentId] : undefined;
+  });
   
   const sections = currentApp?.sections || [];
   const currentSectionIndex = currentApp?.currentSectionIndex || 0;
