@@ -1,14 +1,16 @@
 import React from 'react';
 import { Button } from '../components/Button';
 import { Eye, Plus, Briefcase } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { APPLICATION_TYPES } from '../constants/applicationTypes';
 import type { ApplicationType } from '../constants/applicationTypes';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
-// Mock data for applications
+// Minimal mock data for applications with realistic IDs
 const mockApplications = [
   {
-    id: '1',
+    id: '25QL-LZ29V',
+    type: 'sba',
     name: 'Flow Pilot',
     applicationNumber: '25QL-LZ29V',
     primaryApplicant: 'Brian Hogan',
@@ -17,7 +19,8 @@ const mockApplications = [
     status: 'incomplete',
   },
   {
-    id: '2',
+    id: '25QL-AB123',
+    type: 'sba',
     name: 'Tech Startup Expansion',
     applicationNumber: '25QL-AB123',
     primaryApplicant: 'Brian Hogan',
@@ -26,7 +29,8 @@ const mockApplications = [
     status: 'under-review',
   },
   {
-    id: '3',
+    id: '25QL-CD456',
+    type: 'sba',
     name: 'Restaurant Equipment',
     applicationNumber: '25QL-CD456',
     primaryApplicant: 'Brian Hogan',
@@ -53,10 +57,17 @@ const getStatusColor = (status: string) => {
 
 const ApplicationsPage: React.FC = () => {
   const { type } = useParams<{ type?: ApplicationType }>();
+  const navigate = useNavigate();
   const appType: ApplicationType = (type && APPLICATION_TYPES.includes(type as ApplicationType) ? type : APPLICATION_TYPES[0]) as ApplicationType;
+
+  const handleViewApplication = (application: { id: string; type: string }) => {
+    navigate(`/applications/${application.type}/${application.id}`);
+  };
+
   return (
     <div className="flex-1 px-8 py-12">
       <div className="max-w-6xl mx-auto">
+        <Breadcrumbs />
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-semibold text-gray-900 mb-2">
@@ -111,7 +122,11 @@ const ApplicationsPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="col-span-2">
-                    <Button variant="primary" className="flex items-center space-x-1 px-4 py-2 text-sm">
+                    <Button 
+                      variant="primary" 
+                      className="flex items-center space-x-1 px-4 py-2 text-sm"
+                      onClick={() => handleViewApplication(application)}
+                    >
                       <Eye className="w-4 h-4" />
                       <span>View</span>
                     </Button>

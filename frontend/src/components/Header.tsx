@@ -1,15 +1,14 @@
 import React from 'react';
-import { ChevronLeft, Search, HelpCircle } from 'lucide-react';
+import { Search, HelpCircle } from 'lucide-react';
 import { Button } from './Button';
+import { BackButton } from './BackButton';
 
 interface HeaderProps {
-  onBack?: () => void;
   onSearch?: () => void;
   onHelp?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
-  onBack, 
   onSearch, 
   onHelp 
 }) => {
@@ -17,14 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
     <div className="bg-white border-b border-gray-200 px-8 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button 
-            onClick={onBack}
-            variant="text"
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            Back
-          </Button>
+          <BackButton />
         </div>
         <div className="flex items-center space-x-4">
           <Button 
