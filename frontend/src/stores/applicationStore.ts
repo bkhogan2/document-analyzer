@@ -1,14 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// Section definitions with metadata
 export interface ApplicationSection {
   id: string;
   label: string;
   stepCount: number;
   isRequired: boolean;
   isCompleted: boolean;
-  progress: number; // 0-1 for partial completion
+  progress: number;
 }
 
 export interface ApplicationStep {
@@ -19,37 +18,30 @@ export interface ApplicationStep {
   isRequired: boolean;
 }
 
-export interface ApplicationState {
-  // Application metadata
-  applicationId: string | null;
-  applicationType: string | null;
-  createdAt: Date | null;
-  lastModified: Date | null;
-  
-  // Navigation state
+export interface PerAppState {
+  applicationType: string;
+  createdAt: string; // ISO string
+  lastModified: string; // ISO string
   currentStepIndex: number;
   currentSectionIndex: number;
-  
-  // Progress tracking
   sections: ApplicationSection[];
   steps: ApplicationStep[];
-  
-  // Form data
   formData: Record<string, unknown>;
-  
-  // Actions
-  setApplicationId: (id: string) => void;
-  setApplicationType: (type: string) => void;
+}
+
+export interface ApplicationStoreState {
+  applications: Record<string, PerAppState>;
+  currentApplicationId: string | null;
+  selectApplication: (id: string, type: string) => void;
   setCurrentStep: (stepIndex: number) => void;
   setCurrentSection: (sectionIndex: number) => void;
   updateSectionProgress: (sectionId: string, progress: number) => void;
   markStepCompleted: (stepId: string, completed: boolean) => void;
   markSectionCompleted: (sectionId: string, completed: boolean) => void;
   setFormData: (step: string, data: Record<string, unknown>) => void;
-  resetApplication: () => void;
+  resetApplication: (id: string) => void;
 }
 
-// Default sections configuration
 const defaultSections: ApplicationSection[] = [
   { id: 'welcome', label: 'Welcome', stepCount: 1, isRequired: true, isCompleted: false, progress: 0 },
   { id: 'loan-info', label: 'Loan Information', stepCount: 2, isRequired: true, isCompleted: false, progress: 0 },
@@ -61,182 +53,225 @@ const defaultSections: ApplicationSection[] = [
   { id: 'review', label: 'Review', stepCount: 1, isRequired: true, isCompleted: false, progress: 0 },
 ];
 
-// Default steps configuration
 const defaultSteps: ApplicationStep[] = [
-  // Welcome
   { id: 'welcome-1', sectionId: 'welcome', title: 'Welcome', isCompleted: false, isRequired: true },
-  
-  // Loan Information
   { id: 'loan-info-1', sectionId: 'loan-info', title: 'Loan Information (1)', isCompleted: false, isRequired: true },
   { id: 'loan-info-2', sectionId: 'loan-info', title: 'Loan Information (2)', isCompleted: false, isRequired: true },
-  
-  // Business Info
   { id: 'business-info-1', sectionId: 'business-info', title: 'Business Info (1)', isCompleted: false, isRequired: true },
   { id: 'business-info-2', sectionId: 'business-info', title: 'Business Info (2)', isCompleted: false, isRequired: true },
   { id: 'business-info-3', sectionId: 'business-info', title: 'Business Info (3)', isCompleted: false, isRequired: true },
-  
-  // Owner Information
   { id: 'owner-info-1', sectionId: 'owner-info', title: 'Owner Information (1)', isCompleted: false, isRequired: true },
   { id: 'owner-info-2', sectionId: 'owner-info', title: 'Owner Information (2)', isCompleted: false, isRequired: true },
-  
-  // Certification
   { id: 'certification-1', sectionId: 'certification', title: 'Certification', isCompleted: false, isRequired: true },
-  
-  // Pre-Screen Questions
   { id: 'pre-screen-1', sectionId: 'pre-screen', title: 'Pre-Screen Questions (1)', isCompleted: false, isRequired: true },
   { id: 'pre-screen-2', sectionId: 'pre-screen', title: 'Pre-Screen Questions (2)', isCompleted: false, isRequired: true },
-  
-  // Documents
   { id: 'documents-1', sectionId: 'documents', title: 'Documents (1)', isCompleted: false, isRequired: true },
   { id: 'documents-2', sectionId: 'documents', title: 'Documents (2)', isCompleted: false, isRequired: true },
-  
-  // Review
   { id: 'review-1', sectionId: 'review', title: 'Review', isCompleted: false, isRequired: true },
 ];
 
-export const useApplicationStore = create<ApplicationState>()(
+export const useApplicationStore = create<ApplicationStoreState>()(
   persist(
     (set, get) => ({
-      // Initial state
-      applicationId: null,
-      applicationType: null,
-      createdAt: null,
-      lastModified: null,
-      currentStepIndex: 0,
-      currentSectionIndex: 0,
-      sections: defaultSections,
-      steps: defaultSteps,
-      formData: {},
-      
-      // Actions
-      setApplicationId: (id: string) => set({ 
-        applicationId: id,
-        createdAt: new Date(),
-        lastModified: new Date()
-      }),
-      
-      setApplicationType: (type: string) => set({ 
-        applicationType: type,
-        lastModified: new Date()
-      }),
-      
-      setCurrentStep: (stepIndex: number) => {
-        const { steps } = get();
-        const step = steps[stepIndex];
-        if (!step) return;
-        
-        const sectionIndex = get().sections.findIndex(s => s.id === step.sectionId);
-        
-        set({ 
-          currentStepIndex: stepIndex,
-          currentSectionIndex: sectionIndex,
-          lastModified: new Date()
-        });
+      applications: {},
+      currentApplicationId: null,
+
+      selectApplication: (id, type) => {
+        console.log('[store] selectApplication', { id, type });
+        const state = get();
+        if (state.currentApplicationId === id && state.applications[id]) return;
+        // If not initialized, initialize
+        if (!state.applications[id]) {
+          get().resetApplication(id, type);
+        }
+        set({ currentApplicationId: id });
       },
-      
-      setCurrentSection: (sectionIndex: number) => {
-        const { sections, steps } = get();
-        const section = sections[sectionIndex];
-        if (!section) return;
-        
-        // Find the first step of this section
-        const firstStepIndex = steps.findIndex(s => s.sectionId === section.id);
-        if (firstStepIndex === -1) return;
-        
-        set({ 
-          currentStepIndex: firstStepIndex,
-          currentSectionIndex: sectionIndex,
-          lastModified: new Date()
-        });
-      },
-      
-      updateSectionProgress: (sectionId: string, progress: number) => {
-        set(state => ({
-          sections: state.sections.map(section => 
-            section.id === sectionId 
-              ? { ...section, progress: Math.max(0, Math.min(1, progress)) }
-              : section
-          ),
-          lastModified: new Date()
-        }));
-      },
-      
-      markStepCompleted: (stepId: string, completed: boolean) => {
+
+      setCurrentStep: (stepIndex) => {
+        console.log('[store] setCurrentStep', { stepIndex });
+        const id = get().currentApplicationId;
+        if (!id) return;
         set(state => {
-          const updatedSteps = state.steps.map(step => 
+          const app = state.applications[id];
+          if (!app) return {};
+          const step = app.steps[stepIndex];
+          if (!step) return {};
+          const sectionIndex = app.sections.findIndex(s => s.id === step.sectionId);
+          return {
+            applications: {
+              ...state.applications,
+              [id]: {
+                ...app,
+                currentStepIndex: stepIndex,
+                currentSectionIndex: sectionIndex,
+                lastModified: new Date().toISOString(),
+              },
+            },
+          };
+        });
+      },
+
+      setCurrentSection: (sectionIndex) => {
+        console.log('[store] setCurrentSection', { sectionIndex });
+        const id = get().currentApplicationId;
+        if (!id) return;
+        set(state => {
+          const app = state.applications[id];
+          if (!app) return {};
+          const section = app.sections[sectionIndex];
+          if (!section) return {};
+          const firstStepIndex = app.steps.findIndex(s => s.sectionId === section.id);
+          if (firstStepIndex === -1) return {};
+          return {
+            applications: {
+              ...state.applications,
+              [id]: {
+                ...app,
+                currentStepIndex: firstStepIndex,
+                currentSectionIndex: sectionIndex,
+                lastModified: new Date().toISOString(),
+              },
+            },
+          };
+        });
+      },
+
+      updateSectionProgress: (sectionId, progress) => {
+        console.log('[store] updateSectionProgress', { sectionId, progress });
+        const id = get().currentApplicationId;
+        if (!id) return;
+        set(state => {
+          const app = state.applications[id];
+          if (!app) return {};
+          return {
+            applications: {
+              ...state.applications,
+              [id]: {
+                ...app,
+                sections: app.sections.map(section =>
+                  section.id === sectionId
+                    ? { ...section, progress: Math.max(0, Math.min(1, progress)) }
+                    : section
+                ),
+                lastModified: new Date().toISOString(),
+              },
+            },
+          };
+        });
+      },
+
+      markStepCompleted: (stepId, completed) => {
+        console.log('[store] markStepCompleted', { stepId, completed });
+        const id = get().currentApplicationId;
+        if (!id) return;
+        set(state => {
+          const app = state.applications[id];
+          if (!app) return {};
+          const updatedSteps = app.steps.map(step =>
             step.id === stepId ? { ...step, isCompleted: completed } : step
           );
-          
-          // Recalculate section progress
-          const updatedSections = state.sections.map(section => {
+          const updatedSections = app.sections.map(section => {
             const sectionSteps = updatedSteps.filter(step => step.sectionId === section.id);
             const completedSteps = sectionSteps.filter(step => step.isCompleted).length;
             const progress = sectionSteps.length > 0 ? completedSteps / sectionSteps.length : 0;
-            
             return {
               ...section,
               progress,
-              isCompleted: progress === 1
+              isCompleted: progress === 1,
             };
           });
-          
           return {
-            steps: updatedSteps,
-            sections: updatedSections,
-            lastModified: new Date()
+            applications: {
+              ...state.applications,
+              [id]: {
+                ...app,
+                steps: updatedSteps,
+                sections: updatedSections,
+                lastModified: new Date().toISOString(),
+              },
+            },
           };
         });
       },
-      
-      markSectionCompleted: (sectionId: string, completed: boolean) => {
+
+      markSectionCompleted: (sectionId, completed) => {
+        console.log('[store] markSectionCompleted', { sectionId, completed });
+        const id = get().currentApplicationId;
+        if (!id) return;
         set(state => {
-          const updatedSections = state.sections.map(section => 
-            section.id === sectionId 
+          const app = state.applications[id];
+          if (!app) return {};
+          const updatedSections = app.sections.map(section =>
+            section.id === sectionId
               ? { ...section, isCompleted: completed, progress: completed ? 1 : 0 }
               : section
           );
-          
-          // Mark all steps in the section as completed
-          const updatedSteps = state.steps.map(step => 
-            step.sectionId === sectionId 
+          const updatedSteps = app.steps.map(step =>
+            step.sectionId === sectionId
               ? { ...step, isCompleted: completed }
               : step
           );
-          
           return {
-            sections: updatedSections,
-            steps: updatedSteps,
-            lastModified: new Date()
+            applications: {
+              ...state.applications,
+              [id]: {
+                ...app,
+                sections: updatedSections,
+                steps: updatedSteps,
+                lastModified: new Date().toISOString(),
+              },
+            },
           };
         });
       },
-      
-      setFormData: (step: string, data: Record<string, unknown>) =>
-        set((state) => ({
-          formData: {
-            ...state.formData,
-            [step]: { 
-              ...(typeof state.formData[step] === 'object' && state.formData[step] !== null ? state.formData[step] as Record<string, unknown> : {}), 
-              ...data 
+
+      setFormData: (step, data) => {
+        console.log('[store] setFormData', { step, data });
+        const id = get().currentApplicationId;
+        if (!id) return;
+        set(state => {
+          const app = state.applications[id];
+          if (!app) return {};
+          return {
+            applications: {
+              ...state.applications,
+              [id]: {
+                ...app,
+                formData: {
+                  ...app.formData,
+                  [step]: {
+                    ...(typeof app.formData[step] === 'object' && app.formData[step] !== null ? app.formData[step] as Record<string, unknown> : {}),
+                    ...data,
+                  },
+                },
+                lastModified: new Date().toISOString(),
+              },
+            },
+          };
+        });
+      },
+
+      resetApplication: (id, type = 'sba') => {
+        console.log('[store] resetApplication', { id, type });
+        set(state => ({
+          applications: {
+            ...state.applications,
+            [id]: {
+              applicationType: type,
+              createdAt: new Date().toISOString(),
+              lastModified: new Date().toISOString(),
+              currentStepIndex: 0,
+              currentSectionIndex: 0,
+              sections: JSON.parse(JSON.stringify(defaultSections)),
+              steps: JSON.parse(JSON.stringify(defaultSteps)),
+              formData: {},
             },
           },
-          lastModified: new Date()
-        })),
-      
-      resetApplication: () => set({
-        applicationId: null,
-        applicationType: null,
-        createdAt: null,
-        lastModified: null,
-        currentStepIndex: 0,
-        currentSectionIndex: 0,
-        sections: defaultSections,
-        steps: defaultSteps,
-        formData: {}
-      }),
+        }));
+      },
     }),
     {
-      name: 'application-store', // localStorage key
+      name: 'application-store',
     }
   )
 ); 

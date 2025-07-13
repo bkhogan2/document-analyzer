@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { useApplicationStore } from '../stores/applicationStore';
 import { Button } from '../components/Button';
 
@@ -61,32 +62,36 @@ function WizardFooter({
 }
 
 export default function RHFApplicationWizard() {
+  const { type, id } = useParams<{ type: string; id: string }>();
   const {
-    currentStepIndex,
-    steps,
-    sections,
-    currentSectionIndex,
+    selectApplication,
     setCurrentStep,
     markStepCompleted,
-    setApplicationId,
-    setApplicationType
   } = useApplicationStore();
+
+  // Get current application state
+  const currentApplicationId = useApplicationStore(state => state.currentApplicationId);
+  const currentApp = useApplicationStore(state => 
+    currentApplicationId ? state.applications[currentApplicationId] : undefined
+  );
 
   // Initialize application when component mounts
   useEffect(() => {
-    // Generate a unique application ID if none exists
-    if (!useApplicationStore.getState().applicationId) {
-      const newId = `app_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      setApplicationId(newId);
-      setApplicationType('sba-loan');
+    if (id && type) {
+      selectApplication(id, type);
     }
-  }, [setApplicationId, setApplicationType]);
+  }, [id, type, selectApplication]);
 
   // Set up RHF context
   const methods = useForm<Record<string, unknown>>({
     defaultValues: {}
   });
 
+  if (!currentApp) {
+    return <div>Loading...</div>;
+  }
+
+  const { currentStepIndex, steps, sections, currentSectionIndex } = currentApp;
   const currentStep = steps[currentStepIndex];
   const currentSection = sections[currentSectionIndex];
   const stepCount = steps.length;
