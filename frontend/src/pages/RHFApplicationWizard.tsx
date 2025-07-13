@@ -69,11 +69,11 @@ export default function RHFApplicationWizard() {
     markStepCompleted,
   } = useApplicationStore();
 
-  // Get current application state
-  const currentApplicationId = useApplicationStore(state => state.currentApplicationId);
-  const currentApp = useApplicationStore(state => 
-    currentApplicationId ? state.applications[currentApplicationId] : undefined
-  );
+  // Get current application state using stable selectors
+  const currentApp = useApplicationStore(state => {
+    const currentId = state.currentApplicationId;
+    return currentId ? state.applications[currentId] : undefined;
+  });
 
   // Initialize application when component mounts
   useEffect(() => {

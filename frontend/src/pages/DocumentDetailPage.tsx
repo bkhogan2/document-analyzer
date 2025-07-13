@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDocumentStore } from '../stores/documentStore';
+import { useApplicationStore } from '../stores/applicationStore';
 import { Upload, CheckCircle, X, Clock, FileText } from 'lucide-react';
 import { Button } from '../components/Button';
 import { DragAndDropArea } from '../components/DragAndDropArea';
@@ -8,7 +9,8 @@ import { useNotification } from '../components/NotificationProvider';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export const DocumentDetailPage: React.FC = () => {
-  const { categoryId } = useParams<{ categoryId: string }>();
+  const { categoryId, id: applicationId, type: applicationType } = useParams<{ categoryId: string; id: string; type: string }>();
+  const { selectApplication } = useApplicationStore();
   const category = useDocumentStore(state => state.categories.find(cat => cat.id === categoryId));
   const getDocumentsByCategory = useDocumentStore(state => state.getDocumentsByCategory);
   const documents = getDocumentsByCategory(categoryId!);
@@ -17,6 +19,13 @@ export const DocumentDetailPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { notify } = useNotification();
   const fetchDocuments = useDocumentStore(state => state.fetchDocuments);
+
+  // Initialize application when component mounts
+  useEffect(() => {
+    if (applicationId && applicationType) {
+      selectApplication(applicationId, applicationType);
+    }
+  }, [applicationId, applicationType, selectApplication]);
 
   useEffect(() => {
     fetchDocuments();
