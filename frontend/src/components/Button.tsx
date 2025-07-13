@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'text';
@@ -11,13 +11,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyles =
-  'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none';
+  'inline-flex items-center justify-center font-medium transition-colors disabled:opacity-60 disabled:pointer-events-none border-none outline-none shadow-none focus:ring-0 focus:outline-none';
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 focus:ring-green-500',
+    'bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700',
   secondary:
-    'bg-white text-gray-700 border border-gray-300 px-8 py-3 rounded-lg hover:bg-gray-100 focus:ring-gray-400',
+    'bg-white text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-100',
   text:
     'bg-transparent px-2 py-1', // No text color, let className control it
 };
