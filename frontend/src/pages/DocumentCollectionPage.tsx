@@ -15,12 +15,8 @@ export const DocumentCollectionPage: React.FC = () => {
     isLoading,
     error,
     showMore,
-    dragOver,
-    isDragging,
     hoveredStatusIcon,
     setShowMore,
-    setIsDragging,
-    setDragOver,
     setHoveredStatusIcon,
     fetchDocuments,
     getCategoryStatus,
@@ -42,28 +38,6 @@ export const DocumentCollectionPage: React.FC = () => {
     ...category,
     status: getCategoryStatus(category.id)
   }));
-
-  const handleDragOver = (e: React.DragEvent, categoryId: string) => {
-    e.preventDefault();
-    if (isDragging) {
-      setDragOver(categoryId);
-    }
-  };
-
-  const handleDragLeave = (e: React.DragEvent, categoryId: string) => {
-    e.preventDefault();
-    if (dragOver === categoryId) {
-      setDragOver(null);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent, categoryId: string) => {
-    e.preventDefault();
-    setDragOver(null);
-    setIsDragging(false);
-    const files = e.dataTransfer.files;
-    uploadFiles(categoryId, files);
-  };
 
   const openFileDialog = (categoryId: string) => {
     fileInputRefs.current[categoryId]?.click();
@@ -118,16 +92,11 @@ export const DocumentCollectionPage: React.FC = () => {
         <PageHeader />
         <DocumentGrid
           categories={visibleItems}
-          dragOver={dragOver}
-          isDragging={isDragging}
           hoveredStatusIcon={hoveredStatusIcon}
           onCycleStatus={cycleStatus}
           onRemoveFile={(_categoryId, fileNameOrId) => deleteDocument(fileNameOrId)}
           onOpenFileDialog={openFileDialog}
           onFileUpload={handleFileUpload}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
           fileInputRefs={fileInputRefs}
           onMouseEnterStatus={setHoveredStatusIcon}
           onMouseLeaveStatus={() => setHoveredStatusIcon(null)}

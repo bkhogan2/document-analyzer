@@ -1,8 +1,23 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 interface SidebarProps {
   logoUrl?: string;
 }
+
+const mainLinks = [
+  {
+    label: 'SBA Applications',
+    to: '/applications/sba',
+  },
+];
+
+const documentLibraryLinks = [
+  {
+    label: 'Current Document Collection',
+    to: '/',
+  },
+];
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   logoUrl = "/public/ampac-large-logo.png" 
@@ -21,12 +36,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Navigation Menu */}
       <div className="flex-1 py-2">
         <nav className="space-y-1">
-          <a href="#" className="block px-3 py-2 text-white bg-gray-700 text-xs font-medium">
-            SBA Applications
-          </a>
-          <a href="#" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 text-xs font-medium transition-colors">
-            Document Library
-          </a>
+          {mainLinks.map(link => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }: { isActive: boolean }) =>
+                `block px-3 py-2 text-xs font-medium transition-colors ${isActive ? 'text-white bg-gray-700' : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+          <div className="pl-2">
+            <div className="text-gray-400 text-[11px] uppercase tracking-wide mb-1 mt-2">Document Library</div>
+            {documentLibraryLinks.map(link => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }: { isActive: boolean }) =>
+                  `block px-3 py-2 text-xs font-medium transition-colors ${isActive ? 'text-white bg-gray-700' : 'text-gray-300 hover:text-white hover:bg-gray-700'}`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </div>
           <a href="#" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 text-xs font-medium transition-colors">
             Loan Pipeline
           </a>

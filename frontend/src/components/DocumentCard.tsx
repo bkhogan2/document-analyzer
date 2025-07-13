@@ -3,7 +3,7 @@ import { Upload } from 'lucide-react';
 import { StatusIcon } from './StatusIcon';
 import { getStatusStyling } from '../utils/statusHelpers';
 import { FileList } from './FileList';
-import type { DocumentCategory } from '../types/document';
+import type { DocumentCategory, DocumentStatus } from '../types/document';
 import type { Document } from '../types/api';
 import { Button } from './Button';
 import { DragAndDropArea } from './DragAndDropArea';
@@ -19,7 +19,7 @@ interface DocumentCardProps {
   fileInputRef: (el: HTMLInputElement | null) => void;
   onMouseEnterStatus: (categoryId: string) => void;
   onMouseLeaveStatus: () => void;
-  getStatusTooltip?: (status: string) => { title: string; description: string; className: string };
+  getStatusTooltip?: (status: DocumentStatus) => { title: string; description: string; className: string };
   statusStyling?: { background: string; border: string; iconBg: string };
   onCardClick?: (categoryId: string) => void;
 }
@@ -62,7 +62,9 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center space-x-3">
               <div className={`p-2 rounded-lg flex-shrink-0 ${styling.iconBg}`}>
-                <Icon className="w-5 h-5 text-gray-600" />
+                <div className="w-5 h-5 text-gray-600 flex items-center justify-center">
+                  <Icon />
+                </div>
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-gray-900 text-sm leading-tight">
