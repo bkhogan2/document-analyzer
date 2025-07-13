@@ -5,40 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { APPLICATION_TYPES } from '../constants/applicationTypes';
 import type { ApplicationType } from '../constants/applicationTypes';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-
-// Minimal mock data for applications with realistic IDs
-export const mockApplications = [
-  {
-    id: '25QL-LZ29V',
-    type: 'sba',
-    name: 'Flow Pilot',
-    applicationNumber: '25QL-LZ29V',
-    primaryApplicant: 'Brian Hogan',
-    email: 'bkhogan2@gmail.com',
-    requestedAmount: 100000,
-    status: 'incomplete',
-  },
-  {
-    id: '25QL-AB123',
-    type: 'sba',
-    name: 'Tech Startup Expansion',
-    applicationNumber: '25QL-AB123',
-    primaryApplicant: 'Brian Hogan',
-    email: 'bkhogan2@gmail.com',
-    requestedAmount: 250000,
-    status: 'under-review',
-  },
-  {
-    id: '25QL-CD456',
-    type: 'sba',
-    name: 'Restaurant Equipment',
-    applicationNumber: '25QL-CD456',
-    primaryApplicant: 'Brian Hogan',
-    email: 'bkhogan2@gmail.com',
-    requestedAmount: 75000,
-    status: 'approved',
-  },
-];
+import { useApplicationStore } from '../stores/applicationStore';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -59,6 +26,10 @@ const ApplicationsPage: React.FC = () => {
   const { type } = useParams<{ type?: ApplicationType }>();
   const navigate = useNavigate();
   const appType: ApplicationType = (type && APPLICATION_TYPES.includes(type as ApplicationType) ? type : APPLICATION_TYPES[0]) as ApplicationType;
+  const allApplications = useApplicationStore(state => state.applications);
+  const applications = Object.entries(allApplications)
+    .filter(([, app]) => app.applicationType === appType)
+    .map(([id, app]) => ({ id, ...app }));
 
   const handleViewApplication = (application: { id: string; type: string }) => {
     navigate(`/applications/${application.type}/${application.id}/home`);
@@ -97,47 +68,58 @@ const ApplicationsPage: React.FC = () => {
             </div>
           </div>
           <div className="divide-y divide-gray-200">
-            {mockApplications.map((application) => (
-              <div key={application.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-                <div className="grid grid-cols-12 gap-4 items-center">
-                  <div className="col-span-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-green-600" />
+            {applications.map((application) => {
+              // Extract display fields from formData if available and type guard
+              const welcome = (typeof application.formData?.welcome === 'object' && application.formData?.welcome !== null)
+                ? application.formData.welcome as Record<string, unknown>
+                : {};
+              const name = typeof welcome.applicantName === 'string' ? welcome.applicantName : application.id;
+              const email = typeof welcome.applicantEmail === 'string' ? welcome.applicantEmail : '';
+              const primaryApplicant = typeof welcome.applicantName === 'string' ? welcome.applicantName : '';
+              const requestedAmount = typeof welcome.requestedAmount === 'number' || typeof welcome.requestedAmount === 'string' ? welcome.requestedAmount : '';
+              const status = 'incomplete';
+              return (
+                <div key={application.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <div className="grid grid-cols-12 gap-4 items-center">
+                    <div className="col-span-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                          <Briefcase className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{name}</h3>
+                          <p className="text-sm text-gray-600">{application.id}</p>
+                        </div>
                       </div>
+                    </div>
+                    <div className="col-span-3">
                       <div>
-                        <h3 className="font-semibold text-gray-900">{application.name}</h3>
-                        <p className="text-sm text-gray-600">{application.applicationNumber}</p>
+                        <p className="font-medium text-gray-900">{primaryApplicant}</p>
+                        <p className="text-sm text-gray-600">{email}</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="col-span-3">
-                    <div>
-                      <p className="font-medium text-gray-900">{application.primaryApplicant}</p>
-                      <p className="text-sm text-gray-600">{application.email}</p>
+                    <div className="col-span-2">
+                      <p className="font-semibold text-gray-900">{requestedAmount ? `$${requestedAmount}` : '--'}</p>
                     </div>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="font-semibold text-gray-900">${application.requestedAmount.toLocaleString()}</p>
-                  </div>
-                  <div className="col-span-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}>
-                      {application.status.charAt(0).toUpperCase() + application.status.slice(1).replace('-', ' ')}
-                    </span>
-                  </div>
-                  <div className="col-span-2">
-                    <Button 
-                      variant="primary" 
-                      className="flex items-center space-x-1 px-4 py-2 text-sm"
-                      onClick={() => handleViewApplication(application)}
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>View</span>
-                    </Button>
+                    <div className="col-span-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+                        {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
+                      </span>
+                    </div>
+                    <div className="col-span-2">
+                      <Button 
+                        variant="primary" 
+                        className="flex items-center space-x-1 px-4 py-2 text-sm"
+                        onClick={() => handleViewApplication({ id: application.id, type: application.applicationType })}
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span>View</span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
