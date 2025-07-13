@@ -68,6 +68,8 @@ function App() {
     };
   }, [setIsDragging]);
 
+  const MinimalPage = () => <div>Test</div>;
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
