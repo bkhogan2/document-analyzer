@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useApplicationStore } from '../stores/applicationStore';
 import { Button } from '../components/Button';
+import { WelcomeStep } from '../components/WelcomeStep';
+import type { WelcomeFormData, WelcomeStepRef } from '../components/WelcomeStep';
 
 // TurboTax-style placeholder step
 function PlaceholderStep({ stepNumber, sectionLabel }: { stepNumber: number; sectionLabel: string }) {
@@ -63,10 +65,13 @@ function WizardFooter({
 
 export default function RHFApplicationWizard() {
   const { type, id } = useParams<{ type: string; id: string }>();
+  const navigate = useNavigate();
   const {
     selectApplication,
     setCurrentStep,
     markStepCompleted,
+    resetApplication,
+    setFormData,
   } = useApplicationStore();
 
   // Get current application state using stable selectors
@@ -87,6 +92,11 @@ export default function RHFApplicationWizard() {
     defaultValues: {}
   });
 
+  // WelcomeStep ref and state
+  const welcomeStepRef = useRef<WelcomeStepRef>(null);
+  const [welcomeValid, setWelcomeValid] = useState(false);
+  const [welcomeSubmitting, setWelcomeSubmitting] = useState(false);
+
   if (!currentApp) {
     return <div>Loading...</div>;
   }
@@ -101,7 +111,6 @@ export default function RHFApplicationWizard() {
     if (currentStep) {
       markStepCompleted(currentStep.id, true);
     }
-    
     // Move to next step
     const nextStepIndex = Math.min(currentStepIndex + 1, stepCount - 1);
     setCurrentStep(nextStepIndex);
@@ -118,7 +127,6 @@ export default function RHFApplicationWizard() {
       if (currentStep) {
         markStepCompleted(currentStep.id, true);
       }
-      
       alert(JSON.stringify(data, null, 2));
     })();
   };
@@ -127,6 +135,52 @@ export default function RHFApplicationWizard() {
     return <div>Loading...</div>;
   }
 
+  // Render WelcomeStep for the first step
+  if (currentStepIndex === 0) {
+    return (
+      <div className="flex flex-col min-h-[70vh] bg-white">
+        <WelcomeStep
+          ref={welcomeStepRef}
+          onSubmit={(data: WelcomeFormData) => {
+            setWelcomeSubmitting(true);
+            // Persist the application with form data
+            if (id && type) {
+              resetApplication(id, type); // Ensure a fresh app
+              setFormData('welcome', data as unknown as Record<string, unknown>); // Store welcome form data
+            }
+            markStepCompleted(currentStep.id, true);
+            setCurrentStep(1); // Move to next step
+            setWelcomeSubmitting(false);
+          }}
+          onFormStateChange={({ isValid }) => setWelcomeValid(isValid)}
+        />
+        <footer>
+          <div className="max-w-6xl mx-auto w-full px-8">
+            <div className="border-t border-gray-200 mt-8 pt-4 flex items-center justify-between">
+              <Button
+                type="button"
+                onClick={() => navigate('/applications')}
+                variant="text"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Back
+              </Button>
+              <Button
+                type="button"
+                onClick={() => welcomeStepRef.current?.submitForm()}
+                variant="primary"
+                disabled={!welcomeValid || welcomeSubmitting}
+              >
+                Create Application
+              </Button>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // All other steps: existing logic
   return (
     <FormProvider {...methods}>
       <div className="flex flex-col min-h-[70vh]">

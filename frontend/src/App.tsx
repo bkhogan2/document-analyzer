@@ -68,8 +68,6 @@ function App() {
     };
   }, [setIsDragging]);
 
-  const MinimalPage = () => <div>Test</div>;
-
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -77,7 +75,6 @@ function App() {
         <Route path="documents" element={<DocumentLibraryPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
       </Route>
-      
       {/* Application-specific routes with persistent stepper */}
       <Route path="/" element={<ApplicationLayoutWrapper />}>
         <Route path="applications">

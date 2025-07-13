@@ -14,7 +14,7 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
   const sectionProgress = sections.map(s => s.progress);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* Persistent Stepper - only show when application is active */}
       <div className="sticky top-0 z-10 bg-white">
         <Stepper 
@@ -25,7 +25,7 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
         />
       </div>
       {/* Main content */}
-      <div className="flex-1">
+      <div className="flex-1 bg-white">
         {children}
       </div>
     </div>
