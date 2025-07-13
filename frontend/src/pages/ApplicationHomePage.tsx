@@ -34,7 +34,9 @@ const ApplicationHomePage: React.FC = () => {
   }, [applicationId, applicationType, setApplicationId, setApplicationType]);
 
   const handleContinueApplication = () => {
-    navigate('/applications/new');
+    if (applicationType && applicationId) {
+      navigate(`/applications/${applicationType}/${applicationId}/steps`);
+    }
   };
 
   // Handle file upload (accept any file type)
