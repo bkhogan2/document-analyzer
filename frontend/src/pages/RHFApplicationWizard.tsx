@@ -5,6 +5,7 @@ import { useApplicationStore } from '../stores/applicationStore';
 import { Button } from '../components/Button';
 import { WelcomeStep } from '../components/WelcomeStep';
 import type { WelcomeFormData, WelcomeStepRef } from '../components/WelcomeStep';
+import { DocumentCollectionStep } from '../components/DocumentCollectionStep';
 
 // TurboTax-style placeholder step
 function PlaceholderStep({ stepNumber, sectionLabel }: { stepNumber: number; sectionLabel: string }) {
@@ -176,6 +177,26 @@ export default function RHFApplicationWizard() {
             </div>
           </div>
         </footer>
+      </div>
+    );
+  }
+
+  // Render Document Collection for the documents steps
+  if (currentStep.id === 'documents-1' || currentStep.id === 'documents-2') {
+    return (
+      <div className="flex flex-col min-h-[70vh] bg-white">
+        <div className="flex-1 max-w-6xl mx-auto w-full px-8 py-8">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">SBA Loan Document Collection</h2>
+          <p className="text-gray-600 mb-8">Upload the required documents for your SBA loan application. All documents should be current and complete.</p>
+          <DocumentCollectionStep applicationId={id} applicationType={type} />
+        </div>
+        <WizardFooter
+          currentStep={currentStepIndex}
+          stepCount={stepCount}
+          onBack={back}
+          onNext={next}
+          onSubmit={onSubmit}
+        />
       </div>
     );
   }

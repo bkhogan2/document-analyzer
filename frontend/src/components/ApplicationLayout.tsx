@@ -1,6 +1,7 @@
 import React from 'react';
 import { Stepper } from './Stepper';
 import { useApplicationStore } from '../stores/applicationStore';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Get current application state using stable selectors
@@ -12,6 +13,16 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
   const sections = currentApp?.sections || [];
   const currentSectionIndex = currentApp?.currentSectionIndex || 0;
   const sectionProgress = sections.map(s => s.progress);
+  const { setCurrentSection } = useApplicationStore();
+  const navigate = useNavigate();
+  const params = useParams<{ type: string; id: string }>();
+
+  const handleSectionClick = (sectionIndex: number) => {
+    setCurrentSection(sectionIndex);
+    if (params.type && params.id) {
+      navigate(`/applications/${params.type}/${params.id}/steps`);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -21,7 +32,7 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
           sections={sections}
           sectionProgress={sectionProgress}
           currentSection={currentSectionIndex}
-          onSectionClick={() => {}}
+          onSectionClick={handleSectionClick}
         />
       </div>
       {/* Main content */}
