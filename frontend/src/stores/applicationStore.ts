@@ -40,6 +40,7 @@ export interface ApplicationStoreState {
   markSectionCompleted: (sectionId: string, completed: boolean) => void;
   setFormData: (step: string, data: Record<string, unknown>) => void;
   resetApplication: (id: string, type?: string) => void;
+  deleteApplication: (id: string) => void;
 }
 
 const defaultSections: ApplicationSection[] = [
@@ -273,6 +274,17 @@ export const useApplicationStore = create<ApplicationStoreState>()(
             },
           },
         }));
+      },
+
+      deleteApplication: (id) => {
+        set(state => {
+          const newApps = { ...state.applications };
+          delete newApps[id];
+          return {
+            applications: newApps,
+            currentApplicationId: state.currentApplicationId === id ? null : state.currentApplicationId,
+          };
+        });
       },
     }),
     {
