@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../components/Button';
-import { Eye, Plus, Briefcase } from 'lucide-react';
+import { Eye, Plus, Briefcase, Trash } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { APPLICATION_TYPES } from '../constants/applicationTypes';
 import type { ApplicationType } from '../constants/applicationTypes';
@@ -30,6 +30,7 @@ const ApplicationsPage: React.FC = () => {
   const applications = Object.entries(allApplications)
     .filter(([, app]) => app.applicationType === appType)
     .map(([id, app]) => ({ id, ...app }));
+  const deleteApplication = useApplicationStore(state => state.deleteApplication);
 
   const handleViewApplication = (application: { id: string; type: string }) => {
     navigate(`/applications/${application.type}/${application.id}/home`);
@@ -115,6 +116,19 @@ const ApplicationsPage: React.FC = () => {
                         <Eye className="w-4 h-4" />
                         <span>View</span>
                       </Button>
+                      <button
+                        type="button"
+                        title="Delete Application"
+                        className="ml-2 p-1 rounded hover:bg-red-50 text-red-600 transition-colors"
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to delete this application? This action cannot be undone.')) {
+                            deleteApplication(application.id);
+                          }
+                        }}
+                        aria-label="Delete Application"
+                      >
+                        <Trash className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
                 </div>
