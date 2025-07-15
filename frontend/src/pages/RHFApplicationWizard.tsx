@@ -6,6 +6,9 @@ import { Button } from '../components/Button';
 import { WelcomeStep } from '../components/WelcomeStep';
 import type { WelcomeFormData, WelcomeStepRef } from '../components/WelcomeStep';
 import { DocumentCollectionStep } from '../components/DocumentCollectionStep';
+import { DynamicStep } from '../components/form/DynamicStep';
+import type { DynamicStepRef } from '../components/form/DynamicStep';
+import { formConfigs, type StepId } from '../data/formConfigs';
 
 // TurboTax-style placeholder step
 function PlaceholderStep({ stepNumber, sectionLabel }: { stepNumber: number; sectionLabel: string }) {
@@ -125,14 +128,15 @@ export default function RHFApplicationWizard() {
     defaultValues: {}
   });
 
-  // WelcomeStep ref and state
+  // Form step refs and state
   const welcomeStepRef = useRef<WelcomeStepRef>(null);
-  const [welcomeValid, setWelcomeValid] = useState(false);
-  const [welcomeSubmitting, setWelcomeSubmitting] = useState(false);
+  const dynamicStepRef = useRef<DynamicStepRef>(null);
+  const [formValid, setFormValid] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   // Stable callback to prevent infinite loops
   const handleFormStateChange = useCallback(({ isValid }: { isValid: boolean }) => {
-    setWelcomeValid(isValid);
+    setFormValid(isValid);
   }, []);
 
   if (!currentApp) {
@@ -203,7 +207,7 @@ export default function RHFApplicationWizard() {
         <WelcomeStep
           ref={welcomeStepRef}
           onSubmit={(data: WelcomeFormData) => {
-            setWelcomeSubmitting(true);
+            setFormSubmitting(true);
             // Persist the application with form data
             if (id && type) {
               resetApplication(id, type); // Ensure a fresh app
@@ -211,7 +215,7 @@ export default function RHFApplicationWizard() {
             }
             markStepCompleted(currentStep.id, true);
             setCurrentStep(1); // Move to next step
-            setWelcomeSubmitting(false);
+            setFormSubmitting(false);
           }}
           onFormStateChange={handleFormStateChange}
         />
@@ -230,7 +234,7 @@ export default function RHFApplicationWizard() {
                 type="button"
                 onClick={() => welcomeStepRef.current?.submitForm()}
                 variant="primary"
-                disabled={!welcomeValid || welcomeSubmitting}
+                disabled={!formValid || formSubmitting}
               >
                 Create Application
               </Button>
@@ -257,6 +261,57 @@ export default function RHFApplicationWizard() {
           onNext={next}
           onSubmit={onSubmit}
         />
+      </div>
+    );
+  }
+
+  // Check if this step has a form configuration
+  const stepId = currentStep.id as StepId;
+  const hasFormConfig = stepId in formConfigs;
+
+  // Render dynamic form step if configuration exists
+  if (hasFormConfig) {
+    return (
+      <div className="flex flex-col min-h-[70vh] bg-white">
+        <DynamicStep
+          ref={dynamicStepRef}
+          stepId={stepId}
+          onSubmit={(data: Record<string, unknown>) => {
+            setFormSubmitting(true);
+            // Store form data
+            if (id && type) {
+              setFormData(stepId, data);
+            }
+            markStepCompleted(currentStep.id, true);
+            next();
+            setFormSubmitting(false);
+          }}
+          onFormStateChange={handleFormStateChange}
+          defaultValues={currentApp?.formData?.[stepId] as Record<string, unknown> || {}}
+        />
+        <footer>
+          <div className="max-w-6xl mx-auto w-full px-8">
+            <div className="border-t border-gray-200 mt-8 pt-4 flex items-center justify-between">
+              <Button
+                type="button"
+                onClick={back}
+                variant="text"
+                className="text-gray-600 hover:text-gray-900"
+                disabled={currentStepIndex === 0}
+              >
+                Back
+              </Button>
+              <Button
+                type="button"
+                onClick={() => dynamicStepRef.current?.submitForm()}
+                variant="primary"
+                disabled={!formValid || formSubmitting}
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        </footer>
       </div>
     );
   }
