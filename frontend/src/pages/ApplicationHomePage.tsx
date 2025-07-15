@@ -60,8 +60,19 @@ const ApplicationHomePage: React.FC = () => {
   };
 
   const handleContinueApplication = () => {
-    if (id && type) {
-      navigate(`/applications/${type}/${id}/steps`);
+    if (id && type && currentApp) {
+      // Navigate to the current step with full URL
+      const currentStep = currentApp.steps[currentApp.currentStepIndex];
+      if (currentStep) {
+        // Parse step ID like "owner-info-1" -> section: "owner-info", step: "1"
+        const parts = currentStep.id.split('-');
+        const stepNumber = parts[parts.length - 1]; // Last part is the step number
+        const sectionId = parts.slice(0, -1).join('-'); // Everything except last part is section
+        navigate(`/applications/${type}/${id}/steps/${sectionId}/${stepNumber}`);
+      } else {
+        // Fallback to just /steps if no current step
+        navigate(`/applications/${type}/${id}/steps`);
+      }
     }
   };
 
