@@ -10,6 +10,7 @@ import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
 import ApplicationHomePage from './pages/ApplicationHomePage';
 import RHFApplicationWizard from './pages/RHFApplicationWizard';
+import { NotFound } from './components/NotFound';
 
 function Layout() {
   return (
@@ -83,8 +84,12 @@ function App() {
           <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
           <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
           <Route path=":type/:id/steps" element={<RHFApplicationWizard />} />
+          <Route path=":type/:id/steps/:section" element={<RHFApplicationWizard />} />
+          <Route path=":type/:id/steps/:section/:step" element={<RHFApplicationWizard />} />
         </Route>
       </Route>
+      {/* 404 route */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

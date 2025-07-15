@@ -20,7 +20,20 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
   const handleSectionClick = (sectionIndex: number) => {
     setCurrentSection(sectionIndex);
     if (params.type && params.id) {
-      navigate(`/applications/${params.type}/${params.id}/steps`);
+      // Find the first step in the selected section
+      const section = sections[sectionIndex];
+      if (section) {
+        const firstStepInSection = currentApp?.steps.find(s => s.sectionId === section.id);
+        if (firstStepInSection) {
+          // Parse step ID like "owner-info-1" -> section: "owner-info", step: "1"
+          const parts = firstStepInSection.id.split('-');
+          const stepNumber = parts[parts.length - 1]; // Last part is the step number
+          const sectionId = parts.slice(0, -1).join('-'); // Everything except last part is section
+          navigate(`/applications/${params.type}/${params.id}/steps/${sectionId}/${stepNumber}`);
+        } else {
+          navigate(`/applications/${params.type}/${params.id}/steps`);
+        }
+      }
     }
   };
 

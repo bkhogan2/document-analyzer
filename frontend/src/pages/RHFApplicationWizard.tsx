@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApplicationStore } from '../stores/applicationStore';
@@ -65,8 +65,13 @@ function WizardFooter({
 }
 
 export default function RHFApplicationWizard() {
-  const { type, id } = useParams<{ type: string; id: string }>();
+  const { type, id, section, step } = useParams<{ type: string; id: string; section?: string; step?: string }>();
   const navigate = useNavigate();
+  
+  // Minimal foundational step: just log URL parameters (no navigation logic)
+  console.log('[Wizard] URL params:', { type, id, section, step });
+  
+
   const {
     selectApplication,
     setCurrentStep,
@@ -86,7 +91,34 @@ export default function RHFApplicationWizard() {
     if (id && type) {
       selectApplication(id, type);
     }
-  }, [id, type, selectApplication]);
+  }, [id, type]); // Removed selectApplication from dependencies
+
+  // URL-to-state sync using ref to avoid unstable dependencies
+  const currentAppRef = useRef(currentApp);
+  currentAppRef.current = currentApp;
+
+  useEffect(() => {
+    if (!section || !step || !currentAppRef.current) return;
+    
+    // Find the step that matches the URL parameters
+    const targetStepId = `${section}-${step}`;
+    const stepIndex = currentAppRef.current.steps.findIndex(s => s.id === targetStepId);
+    
+    if (stepIndex !== -1) {
+      console.log('[Wizard] Navigating to:', { section, step, stepIndex });
+      setCurrentStep(stepIndex);
+    } else {
+      // Invalid URL - redirect to current step
+      console.warn('[Wizard] Invalid URL parameters:', { section, step });
+      const currentStep = currentAppRef.current.steps[currentAppRef.current.currentStepIndex];
+      if (currentStep && id && type) {
+        const parts = currentStep.id.split('-');
+        const stepNumber = parts[parts.length - 1];
+        const sectionId = parts.slice(0, -1).join('-');
+        navigate(`/applications/${type}/${id}/steps/${sectionId}/${stepNumber}`, { replace: true });
+      }
+    }
+  }, [section, step, navigate, id, type]); // Only stable dependencies
 
   // Set up RHF context
   const methods = useForm<Record<string, unknown>>({
@@ -98,11 +130,18 @@ export default function RHFApplicationWizard() {
   const [welcomeValid, setWelcomeValid] = useState(false);
   const [welcomeSubmitting, setWelcomeSubmitting] = useState(false);
 
+  // Stable callback to prevent infinite loops
+  const handleFormStateChange = useCallback(({ isValid }: { isValid: boolean }) => {
+    setWelcomeValid(isValid);
+  }, []);
+
   if (!currentApp) {
     return <div>Loading...</div>;
   }
 
   const { currentStepIndex, steps, sections, currentSectionIndex } = currentApp;
+  
+
   const currentStep = steps[currentStepIndex];
   const currentSection = sections[currentSectionIndex];
   const stepCount = steps.length;
@@ -115,11 +154,31 @@ export default function RHFApplicationWizard() {
     // Move to next step
     const nextStepIndex = Math.min(currentStepIndex + 1, stepCount - 1);
     setCurrentStep(nextStepIndex);
+    
+    // Update URL to reflect new step
+    const nextStep = steps[nextStepIndex];
+    if (nextStep && id && type) {
+      // Parse step ID like "owner-info-1" -> section: "owner-info", step: "1"
+      const parts = nextStep.id.split('-');
+      const stepNumber = parts[parts.length - 1]; // Last part is the step number
+      const sectionId = parts.slice(0, -1).join('-'); // Everything except last part is section
+      navigate(`/applications/${type}/${id}/steps/${sectionId}/${stepNumber}`);
+    }
   };
 
   const back = () => {
     const prevStepIndex = Math.max(currentStepIndex - 1, 0);
     setCurrentStep(prevStepIndex);
+    
+    // Update URL to reflect new step
+    const prevStep = steps[prevStepIndex];
+    if (prevStep && id && type) {
+      // Parse step ID like "owner-info-1" -> section: "owner-info", step: "1"
+      const parts = prevStep.id.split('-');
+      const stepNumber = parts[parts.length - 1]; // Last part is the step number
+      const sectionId = parts.slice(0, -1).join('-'); // Everything except last part is section
+      navigate(`/applications/${type}/${id}/steps/${sectionId}/${stepNumber}`);
+    }
   };
 
   const onSubmit = () => {
@@ -137,6 +196,7 @@ export default function RHFApplicationWizard() {
   }
 
   // Render WelcomeStep for the first step
+  console.log('[Wizard] Rendering step:', { currentStepIndex, currentStepId: currentStep?.id });
   if (currentStepIndex === 0) {
     return (
       <div className="flex flex-col min-h-[70vh] bg-white">
@@ -153,7 +213,7 @@ export default function RHFApplicationWizard() {
             setCurrentStep(1); // Move to next step
             setWelcomeSubmitting(false);
           }}
-          onFormStateChange={({ isValid }) => setWelcomeValid(isValid)}
+          onFormStateChange={handleFormStateChange}
         />
         <footer>
           <div className="max-w-6xl mx-auto w-full px-8">
