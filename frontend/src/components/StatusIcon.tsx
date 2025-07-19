@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { getStatusIcon } from '../utils/statusHelpers';
-import type { DocumentStatus } from '../utils/statusHelpers';
+import { getStatusIcon } from '../utils/statusUtils';
+import type { DocumentStatus } from '../types/document';
 
 interface StatusIconProps {
   status: DocumentStatus;
