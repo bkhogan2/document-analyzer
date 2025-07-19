@@ -107,4 +107,14 @@ celerybeat.pid
 dmypy.json
 
 # Pyre type checker
-.pyre/ 
+.pyre/
+
+# Database files
+*.db
+app.db
+
+# Design files
+ui design steps.md
+
+# Upload directories
+backend/uploads/default/ 
