@@ -4,58 +4,11 @@ import { Survey } from 'survey-react-ui';
 import 'survey-core/survey-core.css';
 import { ApplicationLayout } from '../components/ApplicationLayout';
 import { minimalTheme } from '../themes/minimalTheme';
+import { documentCollectionSurveyConfig } from '../data/documentCollectionSurvey';
+import '../components/SurveyJSDocumentCollection'; // Register custom question type
 
-// Simple test survey configuration
-const testSurveyConfig = {
-  showQuestionNumbers: false,
-  showProgressBar: false,
-  showPageTitles: false,
-  showPageNumbers: false,
-  pageNextText: "Continue",
-  pagePrevText: "‹ Back",
-  completeText: "Submit",
-  title: "Welcome to your SBA Loan Application",
-  description: "This is a dedicated page for testing SurveyJS functionality with proper theming and navigation.",
-  pages: [
-    {
-      name: "page1",
-      title: "Page 1",
-      description: "This is the first page",
-      elements: [
-        {
-          type: "text",
-          name: "name",
-          title: "Full Name",
-          isRequired: false,
-          startWithNewLine: false,
-          colCount: 2
-        },
-        {
-          type: "text",
-          name: "email",
-          title: "Email Address",
-          isRequired: false,
-          startWithNewLine: false
-        },
-        {
-          type: "text",
-          name: "phone",
-          title: "Phone Number",
-          isRequired: false,
-          startWithNewLine: true,
-          colCount: 2
-        },
-        {
-          type: "text",
-          name: "address",
-          title: "Street Address",
-          isRequired: false,
-          startWithNewLine: false
-        }
-      ]
-    }
-  ]
-};
+// Use document collection survey configuration with navigation
+const testSurveyConfig = documentCollectionSurveyConfig;
 
 export default function SurveyJSTestPage() {
   const [survey] = React.useState(() => {
@@ -64,7 +17,7 @@ export default function SurveyJSTestPage() {
     // Apply minimal theme
     model.applyTheme(minimalTheme);
     
-    // Disable SurveyJS navigation and create our own
+    // Disable SurveyJS navigation and use our custom footer
     model.showNavigationButtons = false;
     model.showProgressBar = false;
     
@@ -76,33 +29,55 @@ export default function SurveyJSTestPage() {
     return model;
   });
 
+  // Navigation handlers
+  const handleBack = () => {
+    if (survey.currentPageNo > 0) {
+      survey.prevPage();
+    }
+  };
+
+  const handleContinue = () => {
+    if (survey.currentPageNo < survey.pageCount - 1) {
+      survey.nextPage();
+    } else {
+      survey.completeLastPage();
+    }
+  };
+
+  const handleSkip = () => {
+    // Skip to next page
+    if (survey.currentPageNo < survey.pageCount - 1) {
+      survey.nextPage();
+    }
+  };
+
   return (
     <ApplicationLayout>
       <div className="flex-1 px-8 pt-16 pb-12">
         <div>
-                      <div className="bg-white rounded-lg mx-auto" style={{ maxWidth: '50rem' }}>
-              <div>
-                <Survey model={survey} />
-              </div>
+                      <div className="bg-white rounded-lg mx-auto" style={{ maxWidth: '80rem' }}>
+                          <div>
+              <Survey model={survey} />
+            </div>
             {/* Custom footer */}
             <div className="border-t border-gray-200 bg-white mt-12 py-4">
-              <div className="flex justify-between items-center max-w-2xl mx-auto">
+              <div className="flex justify-between items-center">
                 <button 
                   className="text-gray-600 hover:text-gray-800 font-medium"
-                  onClick={() => console.log('Back clicked')}
+                  onClick={handleBack}
                 >
                   ‹ Back
                 </button>
                 <div className="flex gap-4">
                   <button 
                     className="border-2 border-green-500 text-green-500 px-3 py-1.5 rounded hover:bg-green-50 font-medium"
-                    onClick={() => console.log('Skip for now clicked')}
+                    onClick={handleSkip}
                   >
                     Skip for now
                   </button>
                   <button 
                     className="bg-green-500 text-white px-5 py-1.5 rounded hover:bg-green-600 font-medium"
-                    onClick={() => console.log('Continue clicked')}
+                    onClick={handleContinue}
                   >
                     Continue
                   </button>
