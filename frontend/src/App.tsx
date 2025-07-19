@@ -10,6 +10,7 @@ import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
 import ApplicationHomePage from './pages/ApplicationHomePage';
 import RHFApplicationWizard from './pages/RHFApplicationWizard';
+import SurveyJSTestPage from './pages/SurveyJSTestPage';
 import { NotFound } from './components/NotFound';
 
 function Layout() {
@@ -75,6 +76,7 @@ function App() {
         <Route index element={<Navigate to="/applications" replace />} />
         <Route path="documents" element={<DocumentLibraryPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
+        <Route path="survey-test" element={<SurveyJSTestPage />} />
       </Route>
       {/* Application-specific routes with persistent stepper */}
       <Route path="/" element={<ApplicationLayoutWrapper />}>

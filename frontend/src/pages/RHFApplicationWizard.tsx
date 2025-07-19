@@ -3,12 +3,15 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApplicationStore } from '../stores/applicationStore';
 import { Button } from '../components/Button';
-import { WelcomeStep } from '../components/WelcomeStep';
-import type { WelcomeFormData, WelcomeStepRef } from '../components/WelcomeStep';
+// import { WelcomeStep } from '../components/WelcomeStep';
+// import type { WelcomeFormData, WelcomeStepRef } from '../components/WelcomeStep';
 import { DocumentCollectionStep } from '../components/DocumentCollectionStep';
 import { DynamicStep } from '../components/form/DynamicStep';
 import type { DynamicStepRef } from '../components/form/DynamicStep';
+import { SurveyJSStep } from '../components/form/SurveyJSStep';
+import type { SurveyJSStepRef } from '../components/form/SurveyJSStep';
 import { formConfigs, type StepId } from '../data/formConfigs';
+import { welcomeSurveyConfig } from '../data/surveyConfigs';
 
 // TurboTax-style placeholder step
 function PlaceholderStep({ stepNumber, sectionLabel }: { stepNumber: number; sectionLabel: string }) {
@@ -129,8 +132,9 @@ export default function RHFApplicationWizard() {
   });
 
   // Form step refs and state
-  const welcomeStepRef = useRef<WelcomeStepRef>(null);
+  // const welcomeStepRef = useRef<WelcomeStepRef>(null);
   const dynamicStepRef = useRef<DynamicStepRef>(null);
+  const surveyJSStepRef = useRef<SurveyJSStepRef>(null);
   const [formValid, setFormValid] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
 
@@ -199,25 +203,29 @@ export default function RHFApplicationWizard() {
     return <div>Loading...</div>;
   }
 
-  // Render WelcomeStep for the first step
+  // Render WelcomeStep for the first step (testing SurveyJS)
   console.log('[Wizard] Rendering step:', { currentStepIndex, currentStepId: currentStep?.id });
   if (currentStepIndex === 0) {
     return (
       <div className="flex flex-col min-h-[70vh] bg-white">
-        <WelcomeStep
-          ref={welcomeStepRef}
-          onSubmit={(data: WelcomeFormData) => {
+        <SurveyJSStep
+          ref={surveyJSStepRef}
+          surveyConfig={welcomeSurveyConfig}
+          title="Welcome to Your SBA Loan Application"
+          description="Please provide your contact and business information to get started."
+          onSubmit={(data: Record<string, unknown>) => {
             setFormSubmitting(true);
             // Persist the application with form data
             if (id && type) {
               resetApplication(id, type); // Ensure a fresh app
-              setFormData('welcome', data as unknown as Record<string, unknown>); // Store welcome form data
+              setFormData('welcome', data); // Store welcome form data
             }
             markStepCompleted(currentStep.id, true);
             setCurrentStep(1); // Move to next step
             setFormSubmitting(false);
           }}
           onFormStateChange={handleFormStateChange}
+          defaultValues={currentApp?.formData?.['welcome'] as Record<string, unknown> || {}}
         />
         <footer>
           <div className="max-w-6xl mx-auto w-full px-8">
@@ -232,7 +240,7 @@ export default function RHFApplicationWizard() {
               </Button>
               <Button
                 type="button"
-                onClick={() => welcomeStepRef.current?.submitForm()}
+                onClick={() => surveyJSStepRef.current?.submitForm()}
                 variant="primary"
                 disabled={!formValid || formSubmitting}
               >
