@@ -1,3 +1,244 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Design system variables - SurveyJS will inherit these */
+:root {
+  /* Colors */
+  --ds-surface-background: white;
+  --ds-surface-secondary: #e5e7eb;
+  --ds-text-primary: #1f2937;
+  --ds-text-secondary: #6b7280;
+  --ds-primary-color: #3b82f6;
+  --ds-primary-hover: #2563eb;
+  --ds-primary-text: white;
+  --ds-border-color: #d1d5db;
+  --ds-border-black: #000000;
+  --ds-input-background: white;
+  --ds-focus-blue: #3b82f6;
+  
+  /* Spacing */
+  --ds-spacing-none: 0;
+  --ds-spacing-xs: 0.25rem;
+  --ds-spacing-sm: 0.5rem;
+  --ds-spacing-md: 0.75rem;
+  --ds-spacing-lg: 1rem;
+  
+  /* Border radius */
+  --ds-border-radius: 0;
+  --ds-border-radius-sm: 0.25rem;
+  --ds-border-radius-md: 0.375rem;
+  
+  /* Typography */
+  --ds-text-sm: 0.875rem;
+  --ds-text-lg: 1.125rem;
+  --ds-font-family: 'Avenir Next', 'Avenir', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+  --ds-font-medium: 500;
+  --ds-font-semibold: 600;
+  
+  /* Shadows */
+  --ds-shadow-none: none;
+  --ds-focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Override SurveyJS grey background from survey-core.css */
+.sd-root-modern,
+.sd-container-modern {
+  background-color: white;
+}
+
+/* Remove SurveyJS element frames and styling */
+.sd-element {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Remove padding from SurveyJS body elements */
+.sd-body,
+.sd-body--responsive {
+  padding: 2px !important;
+}
+
+/* Override SurveyJS title styling */
+.sd-title,
+.sd-container-modern_title {
+  padding: 0 !important;
+  box-shadow: none !important;
+  gap: 0 !important;
+  color: var(--ds-text-primary, #1f2937) !important;
+  font-family: var(--ds-font-family, 'Avenir Next') !important;
+  font-weight: 430 !important;
+}
+
+/* Remove margin from the container */
+.sd-container-modern_title {
+  margin-bottom: 0 !important;
+}
+
+/* Target the header text container */
+.sd-header_text {
+  margin-bottom: 0 !important;
+}
+
+/* Add margin only to the actual title text */
+.sd-title {
+  margin-bottom: 2rem;
+}
+
+/* Target the specific title within header text */
+.sd-header_text .sd-title {
+  margin-bottom: 3rem !important;
+}
+
+/* Ensure description has no margin */
+.sd-header_text .sd-description {
+  margin-bottom: 0 !important;
+}
+
+.sd-title.sd-container-modern__title {
+  margin-bottom: 0rem !important;
+}
+
+/* Remove margin from subtitle/description */
+.sd-description,
+.sd-container-modern_description {
+  margin-bottom: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+}
+
+/* Target SurveyJS header elements more specifically */
+.sd-header__title {
+  margin-bottom: 3rem !important;
+}
+
+.sd-header__description {
+  margin-bottom: 0 !important;
+}
+
+/* Alternative selectors for SurveyJS title/description */
+.sd-root-modern .sd-header__title {
+  margin-bottom: 3rem !important;
+}
+
+.sd-root-modern .sd-header__description {
+  margin-bottom: 0 !important;
+}
+
+/* Override SurveyJS font variables */
+.sd-root-modern {
+  --sjs-font-family: var(--ds-font-family, 'Avenir Next') !important;
+  --sjs-font-surveytitle-family: var(--ds-font-family, 'Avenir Next') !important;
+  --sjs-default-font-family: var(--ds-font-family, 'Avenir Next') !important;
+}
+
+/* Override SurveyJS container styling */
+.sd-container-modern {
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Reduce gap between labels and inputs */
+.sd-question__title {
+  margin-bottom: 0.1rem !important;
+}
+
+.sd-question__content {
+  margin-top: 0.1rem !important;
+}
+
+/* Remove padding from question headers */
+.sd-question__header,
+.sd-question__header--location-top {
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Remove top padding from question elements */
+.sd-element--with-frame.sd-question--title-top {
+  padding-top: 0 !important;
+}
+
+/* Force light font weight on question titles */
+.sd-question__title,
+.sd-question__title * {
+  font-weight: 400 !important;
+  font-size: 0.75rem !important;
+  font-family: var(--ds-font-family, 'Avenir Next') !important;
+}
+
+/* Override SurveyJS input styling to match TurboTax */
+.sd-input,
+.sd-text,
+.sd-email,
+.sd-text__input,
+.sd-email__input {
+  border: 1px solid #000000 !important;
+  border-radius: 0.25rem !important;
+  background-color: white !important;
+  font-family: var(--ds-font-family, 'Avenir Next') !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  padding: 0.25rem 0.5rem !important;
+  height: auto !important;
+  min-height: 1.8rem !important;
+}
+
+/* TurboTax-style focus state */
+.sd-input:focus,
+.sd-text:focus,
+.sd-email:focus,
+.sd-text__input:focus,
+.sd-email__input:focus {
+  border-width: 2px !important;
+  border-color: #000000 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Override SurveyJS action bar layout */
+.sd-action-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 1rem !important;
+}
+
+/* Style SurveyJS footer/navigation */
+.sd-footer {
+  border-top: 1px solid #e5e7eb !important;
+  background-color: white !important;
+  padding: 1rem 0 !important;
+  margin-top: 3rem !important;
+  width: 100% !important;
+}
+
+/* Back button - far left */
+.sd-btn--navigation {
+  order: 1 !important;
+  margin-right: auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* Continue button - far right */
+.sd-btn--primary {
+  order: 3 !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ensure all buttons in footer get proper styling */
+.sd-footer__buttons button,
+.sd-action-bar button {
+  border-radius: 0.375rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s !important;
+  min-width: 80px !important;
+}
+
+
