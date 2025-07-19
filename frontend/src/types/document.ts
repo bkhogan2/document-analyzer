@@ -1,4 +1,4 @@
-export type DocumentStatus = 'none' | 'approved' | 'warning' | 'error';
+export type DocumentStatus = 'none' | 'approved' | 'warning' | 'error' | 'incomplete' | 'under-review' | 'rejected';
 
 export interface UploadedFile {
   name: string;

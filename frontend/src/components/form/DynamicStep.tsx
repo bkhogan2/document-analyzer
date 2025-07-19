@@ -1,13 +1,12 @@
-import React, { forwardRef, useImperativeHandle, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { FormBuilder } from './FormBuilder';
 import { formConfigs, type StepId } from '../../data/formConfigs';
 import { PageHeader } from '../PageHeader';
 import { Breadcrumbs } from '../Breadcrumbs';
+import type { StepRef } from '../../types/api';
 
-export interface DynamicStepRef {
-  submitForm: () => void;
-}
+export type DynamicStepRef = StepRef;
 
 interface DynamicStepProps {
   stepId: StepId;

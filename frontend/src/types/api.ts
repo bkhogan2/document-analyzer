@@ -1,23 +1,35 @@
-// API Response Types
-export interface UploadResponse {
-  message: string;
-  filename: string;
+// API response types
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
 }
 
-// Document Type
 export interface Document {
   id: string;
-  user_id: string;
+  name: string;
   category_id: string;
-  filename: string;
-  original_filename: string;
   file_path: string;
+  status: string;
+  uploaded_at: string;
   file_size: number;
   mime_type: string;
-  status: string;
-  status_message?: string;
-  created_at: string;
-  updated_at?: string;
+}
+
+export interface DocumentUploadResponse {
+  document_id: string;
+  message: string;
+  success: boolean;
+}
+
+export interface DocumentDeleteResponse {
+  message: string;
+  success: boolean;
+}
+
+// Shared component types
+export interface StepRef {
+  submitForm: () => void;
 }
 
 // API Error Types
