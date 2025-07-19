@@ -11,85 +11,6 @@ import { useApplicationStore } from '../stores/applicationStore';
 import { useNotification } from '../components/NotificationProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 
-// Example mock documents (in real code, import from a shared mock file)
-const mockDocuments = [
-  {
-    id: 'doc-1',
-    applicationId: '25QL-LZ29V',
-    user_id: 'user-1',
-    category_id: 'business-balance-sheet',
-    filename: 'ai-in-space.pdf',
-    original_filename: 'ai-in-space.pdf',
-    file_path: '/uploads/25QL-LZ29V/business-balance-sheet/ai-in-space.pdf',
-    file_size: 123456,
-    mime_type: 'application/pdf',
-    status: 'approved',
-    status_message: '',
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z',
-  },
-  {
-    id: 'doc-2',
-    applicationId: '25QL-LZ29V',
-    user_id: 'user-1',
-    category_id: 'personal-tax-returns',
-    filename: 'ai-in-space.pdf',
-    original_filename: 'ai-in-space.pdf',
-    file_path: '/uploads/25QL-LZ29V/personal-tax-returns/ai-in-space.pdf',
-    file_size: 123456,
-    mime_type: 'application/pdf',
-    status: 'pending',
-    status_message: '',
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z',
-  },
-  {
-    id: 'doc-3',
-    applicationId: '25QL-LZ29V',
-    user_id: 'user-1',
-    category_id: 'project-costs',
-    filename: 'f1120.pdf',
-    original_filename: 'f1120.pdf',
-    file_path: '/uploads/25QL-LZ29V/project-costs/f1120.pdf',
-    file_size: 654321,
-    mime_type: 'application/pdf',
-    status: 'approved',
-    status_message: '',
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z',
-  },
-  {
-    id: 'doc-4',
-    applicationId: '25QL-AB123',
-    user_id: 'user-2',
-    category_id: 'business-balance-sheet',
-    filename: 'startup-plan.pdf',
-    original_filename: 'startup-plan.pdf',
-    file_path: '/uploads/25QL-AB123/business-balance-sheet/startup-plan.pdf',
-    file_size: 222222,
-    mime_type: 'application/pdf',
-    status: 'pending',
-    status_message: '',
-    created_at: '2024-01-02T10:00:00Z',
-    updated_at: '2024-01-02T10:00:00Z',
-  },
-  {
-    id: 'doc-5',
-    applicationId: '25QL-CD456',
-    user_id: 'user-3',
-    category_id: 'project-costs',
-    filename: 'restaurant-equipment.pdf',
-    original_filename: 'restaurant-equipment.pdf',
-    file_path: '/uploads/25QL-CD456/project-costs/restaurant-equipment.pdf',
-    file_size: 333333,
-    mime_type: 'application/pdf',
-    status: 'approved',
-    status_message: '',
-    created_at: '2024-01-03T10:00:00Z',
-    updated_at: '2024-01-03T10:00:00Z',
-  },
-];
-
 export const DocumentCollectionPage: React.FC = () => {
   const { id: applicationId, type: applicationType } = useParams();
   const { selectApplication } = useApplicationStore();
@@ -124,10 +45,11 @@ export const DocumentCollectionPage: React.FC = () => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // Filter documents for this application
+  // Filter documents for this application using the documents from the store
   const getDocumentsByCategory = (categoryId: string) => {
-    return mockDocuments.filter(
-      doc => doc.applicationId === applicationId && doc.category_id === categoryId
+    const { documents } = useDocumentStore.getState();
+    return documents.filter(
+      (doc) => doc.category_id === categoryId
     );
   };
 

@@ -1,70 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FileText, Download, Eye, Calendar, User } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-
-// Mock data for all documents across applications
-const mockAllDocuments = [
-  {
-    id: 'doc-001',
-    applicationId: 'sba-001',
-    applicationName: 'Restaurant Expansion Loan',
-    filename: 'Business_Tax_Returns_2023.pdf',
-    category: 'Business Tax Returns',
-    fileSize: '2.1 MB',
-    uploadedAt: '2024-01-19T14:30:00Z',
-    status: 'approved',
-    uploadedBy: 'John Smith',
-    mimeType: 'application/pdf'
-  },
-  {
-    id: 'doc-002',
-    applicationId: 'sba-001',
-    applicationName: 'Restaurant Expansion Loan',
-    filename: 'Personal_Financial_Statement.pdf',
-    category: 'Personal Financial Statement',
-    fileSize: '1.5 MB',
-    uploadedAt: '2024-01-19T15:45:00Z',
-    status: 'under_review',
-    uploadedBy: 'John Smith',
-    mimeType: 'application/pdf'
-  },
-  {
-    id: 'doc-003',
-    applicationId: 'sba-002',
-    applicationName: 'Manufacturing Equipment Loan',
-    filename: 'P&L_Statement_2023.xlsx',
-    category: 'Profit & Loss',
-    fileSize: '512 KB',
-    uploadedAt: '2024-01-19T16:20:00Z',
-    status: 'pending',
-    uploadedBy: 'Sarah Johnson',
-    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  },
-  {
-    id: 'doc-004',
-    applicationId: 'sba-003',
-    applicationName: 'Retail Store Working Capital',
-    filename: 'Balance_Sheet_2023.pdf',
-    category: 'Balance Sheet',
-    fileSize: '890 KB',
-    uploadedAt: '2024-01-18T11:15:00Z',
-    status: 'approved',
-    uploadedBy: 'Mike Wilson',
-    mimeType: 'application/pdf'
-  },
-  {
-    id: 'doc-005',
-    applicationId: 'sba-001',
-    applicationName: 'Restaurant Expansion Loan',
-    filename: 'Debt_Schedule.xlsx',
-    category: 'Debt Schedule',
-    fileSize: '320 KB',
-    uploadedAt: '2024-01-20T09:30:00Z',
-    status: 'rejected',
-    uploadedBy: 'John Smith',
-    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  }
-];
+import { useDocumentStore } from '../stores/documentStore';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -96,6 +33,26 @@ const formatDate = (dateString: string) => {
 };
 
 export const DocumentLibraryPage: React.FC = () => {
+  const { documents, fetchDocuments } = useDocumentStore();
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
+
+  // Transform documents to match the expected format
+  const transformedDocuments = documents.map(doc => ({
+    id: doc.id,
+    applicationId: doc.user_id, // Using user_id as applicationId for now
+    applicationName: `Application ${doc.user_id}`,
+    filename: doc.filename,
+    category: doc.category_id,
+    fileSize: `${Math.round(doc.file_size / 1024)} KB`,
+    uploadedAt: doc.created_at,
+    status: doc.status,
+    uploadedBy: 'User', // Placeholder
+    mimeType: doc.mime_type
+  }));
+
   return (
     <div className="flex-1 px-8 py-12">
       <div className="max-w-7xl mx-auto">
@@ -118,7 +75,7 @@ export const DocumentLibraryPage: React.FC = () => {
               <FileText className="w-8 h-8 text-blue-600" />
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Total Documents</p>
-                <p className="text-2xl font-semibold text-gray-900">{mockAllDocuments.length}</p>
+                <p className="text-2xl font-semibold text-gray-900">{transformedDocuments.length}</p>
               </div>
             </div>
           </div>
@@ -130,7 +87,7 @@ export const DocumentLibraryPage: React.FC = () => {
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Approved</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {mockAllDocuments.filter(doc => doc.status === 'approved').length}
+                  {transformedDocuments.filter(doc => doc.status === 'approved').length}
                 </p>
               </div>
             </div>
@@ -143,7 +100,7 @@ export const DocumentLibraryPage: React.FC = () => {
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Pending</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {mockAllDocuments.filter(doc => doc.status === 'pending').length}
+                  {transformedDocuments.filter(doc => doc.status === 'pending').length}
                 </p>
               </div>
             </div>
@@ -156,7 +113,7 @@ export const DocumentLibraryPage: React.FC = () => {
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Under Review</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {mockAllDocuments.filter(doc => doc.status === 'under_review').length}
+                  {transformedDocuments.filter(doc => doc.status === 'under_review').length}
                 </p>
               </div>
             </div>
@@ -176,7 +133,7 @@ export const DocumentLibraryPage: React.FC = () => {
             </div>
           </div>
           <div className="divide-y divide-gray-200">
-            {mockAllDocuments.map((document) => (
+            {transformedDocuments.map((document) => (
               <div key={document.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
                 <div className="grid grid-cols-12 gap-4 items-center">
                   <div className="col-span-3">
