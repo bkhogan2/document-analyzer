@@ -9,8 +9,7 @@ export interface StatusStyling {
   textColor?: string;
 }
 
-// Document status type (consolidated from multiple sources)
-export type DocumentStatusType = 'none' | 'approved' | 'warning' | 'error' | 'incomplete' | 'under-review' | 'rejected';
+// Document status type is now defined in types/document.ts
 
 // Status icon component
 export function getStatusIcon(status: DocumentStatus, className = 'w-5 h-5') {

@@ -1,7 +1,8 @@
-import React, { forwardRef, useImperativeHandle, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { PageHeader } from './PageHeader';
 import { Breadcrumbs } from './Breadcrumbs';
+import type { StepRef } from '../types/api';
 
 export interface WelcomeFormData {
   applicantName: string;
@@ -12,9 +13,7 @@ export interface WelcomeFormData {
   zip: string;
 }
 
-export interface WelcomeStepRef {
-  submitForm: () => void;
-}
+export type WelcomeStepRef = StepRef;
 
 export const WelcomeStep = forwardRef<WelcomeStepRef, {
   onSubmit: (data: WelcomeFormData) => void;
