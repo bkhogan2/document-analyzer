@@ -1,6 +1,5 @@
 // Layout Components
-export { DynamicSidebar } from './DynamicSidebar';
+export { Sidebar } from './Sidebar';
 export { Header } from './Header';
 export { ApplicationLayout } from './ApplicationLayout';
-export { StickyFooter } from './StickyFooter';
-export { Sidebar } from './Sidebar'; 
+export { StickyFooter } from './StickyFooter'; 
