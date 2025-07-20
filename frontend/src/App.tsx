@@ -9,7 +9,6 @@ import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
 import ApplicationHomePage from './pages/ApplicationHomePage';
-import SurveyJSTestPage from './pages/SurveyJSTestPage';
 import SurveyJSApplicationPage from './pages/SurveyJSApplicationPage';
 import { NotFound } from './components/NotFound';
 
@@ -76,7 +75,6 @@ function App() {
         <Route index element={<Navigate to="/applications" replace />} />
         <Route path="documents" element={<DocumentLibraryPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
-        <Route path="survey-test" element={<SurveyJSTestPage />} />
       </Route>
       {/* Application-specific routes with persistent stepper */}
       <Route path="/" element={<ApplicationLayoutWrapper />}>
@@ -88,7 +86,6 @@ function App() {
           <Route path=":type/:id/steps" element={<SurveyJSApplicationPage />} />
           <Route path=":type/:id/steps/:section" element={<SurveyJSApplicationPage />} />
           <Route path=":type/:id/steps/:section/:step" element={<SurveyJSApplicationPage />} />
-          <Route path=":type/:id/surveyjs" element={<SurveyJSApplicationPage />} />
         </Route>
       </Route>
       {/* 404 route */}

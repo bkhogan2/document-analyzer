@@ -4,6 +4,7 @@ import 'survey-core/survey-core.css';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createSurveyJSModel, setupSurveyJSNavigation, setupSurveyJSCompletion } from '../services/surveyJSService';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+import '../components/SurveyJSDocumentCollection'; // Import to register the custom component
 
 export default function SurveyJSApplicationPage() {
   const params = useParams<{ type: string; id: string }>();
