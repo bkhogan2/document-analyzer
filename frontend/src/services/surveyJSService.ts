@@ -1,14 +1,14 @@
-import { Model } from 'survey-core';
-import { minimalTheme } from '../themes/minimalTheme';
+import { Model , settings } from 'survey-core';
+
 import { documentCollectionSurveyConfig } from '../data/documentCollectionSurvey';
 import { 
   getSectionIndexFromPageName, 
   getSectionIdFromPageName, 
   getPageTitle
 } from '../data/surveyPageConfig';
+import { minimalTheme } from '../themes/minimalTheme';
 
 // Global SurveyJS settings
-import { settings } from 'survey-core';
 settings.designMode.showEmptyDescriptions = false;
 
 export interface SurveyJSConfig {

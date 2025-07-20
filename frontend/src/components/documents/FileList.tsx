@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
 import { X, Check, Circle, AlertTriangle } from 'lucide-react';
-import type { Document } from '../types/api';
+import React, { useState } from 'react';
+
+import type { Document } from '../../types/api';
 
 interface FileListProps {
   files: Document[];
@@ -29,14 +30,14 @@ export const FileList: React.FC<FileListProps> = ({ files, onRemoveFile }) => {
               {file.status === 'warning' && <AlertTriangle className="w-3 h-3 text-yellow-600 flex-shrink-0" />}
               {file.status !== 'approved' && file.status !== 'error' && file.status !== 'warning' && <Circle className="w-3 h-3 text-gray-400 flex-shrink-0" />}
               {/* Tooltip for status message */}
-              {hoveredIndex === index && file.status_message && (
+              {hoveredIndex === index && file.status && (
                 <div className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-48 p-2 bg-white text-gray-800 text-xs rounded-lg shadow-xl border border-gray-200 whitespace-pre-line">
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 -ml-2 w-2 h-2 bg-white border-l border-t border-gray-200 transform rotate-45"></div>
-                  {file.status_message}
+                  {file.status}
                 </div>
               )}
             </span>
-            <span className="truncate text-gray-700" title={file.original_filename}>{file.original_filename}</span>
+            <span className="truncate text-gray-900 font-medium" title={file.original_filename}>{file.original_filename}</span>
           </div>
           <button
             onClick={(e) => {

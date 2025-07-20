@@ -1,11 +1,9 @@
+import { Upload, CheckCircle, X, Clock, FileText } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+
+import { Button , DragAndDropArea , useNotification, Breadcrumbs } from '../components/ui';
 import { useDocumentStore } from '../stores/documentStore';
-import { Upload, CheckCircle, X, Clock, FileText } from 'lucide-react';
-import { Button } from '../components/Button';
-import { DragAndDropArea } from '../components/DragAndDropArea';
-import { useNotification } from '../components/NotificationProvider';
-import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export const DocumentDetailPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -101,7 +99,7 @@ export const DocumentDetailPage: React.FC = () => {
                       {file.status === 'pending' && <Clock className="w-6 h-6 text-yellow-600" />}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-lg">{file.original_filename || file.filename}</h3>
+                      <h3 className="font-semibold text-gray-900 text-lg">{file.original_filename}</h3>
                       <div className="flex items-center space-x-2 mt-1">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${file.status === 'approved' ? 'bg-green-100 text-green-800' : file.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
                           {file.status === 'approved' ? 'Approved' : file.status === 'rejected' ? 'Rejected' : 'Under Review'}

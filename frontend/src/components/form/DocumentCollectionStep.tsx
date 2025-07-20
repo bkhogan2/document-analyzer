@@ -1,10 +1,12 @@
 import React, { useRef, useEffect } from 'react';
-import { DocumentGrid } from './DocumentGrid';
-import { getStatusStyling, getStatusTooltip } from '../utils/statusUtils';
-import { useDocumentStore } from '../stores/documentStore';
-import { useApplicationStore } from '../stores/applicationStore';
-import { useNotification } from './NotificationProvider';
 import { useParams, useNavigate } from 'react-router-dom';
+
+import { useApplicationStore } from '../../stores/applicationStore';
+import { useDocumentStore } from '../../stores/documentStore';
+import { getStatusStyling, getStatusTooltip } from '../../utils/statusUtils';
+import { DocumentGrid } from '../documents';
+import { useNotification } from '../ui';
+
 
 interface DocumentCollectionStepProps {
   applicationId?: string;

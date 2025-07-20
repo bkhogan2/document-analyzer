@@ -1,4 +1,5 @@
 import { CheckCircle, Circle, X, AlertTriangle, Clock } from 'lucide-react';
+
 import type { DocumentStatus } from '../types/document';
 
 // Status styling configurations

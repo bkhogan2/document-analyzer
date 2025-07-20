@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { DocumentCategory, DocumentStatus } from '../types/document';
-import type { Document } from '../types/api';
+
 import { sbaDocumentCategories } from '../data/documentCategories';
 import { documentService } from '../services/documentService';
+import type { Document } from '../types/api';
+import type { DocumentCategory, DocumentStatus } from '../types/document';
 
 interface DocumentStore {
   // State

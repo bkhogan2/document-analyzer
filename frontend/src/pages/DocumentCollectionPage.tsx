@@ -1,15 +1,17 @@
 import React, { useRef, useEffect } from 'react';
-import { DocumentGrid } from '../components/DocumentGrid';
-import { FooterButtons } from '../components/FooterButtons';
-import { ShowMoreButton } from '../components/ShowMoreButton';
-import { PageHeader } from '../components/PageHeader';
-import { FooterMessage } from '../components/FooterMessage';
-import { Breadcrumbs } from '../components/Breadcrumbs';
-import { getStatusStyling, getStatusTooltip } from '../utils/statusUtils';
-import { useDocumentStore } from '../stores/documentStore';
-import { useApplicationStore } from '../stores/applicationStore';
-import { useNotification } from '../components/NotificationProvider';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import { DocumentGrid } from '../components/documents';
+import { FooterButtons, FooterMessage } from '../components/footer';
+import { 
+  ShowMoreButton, 
+  PageHeader, 
+  Breadcrumbs, 
+  useNotification 
+} from '../components/ui';
+import { useApplicationStore } from '../stores/applicationStore';
+import { useDocumentStore } from '../stores/documentStore';
+import { getStatusStyling, getStatusTooltip } from '../utils/statusUtils';
 
 export const DocumentCollectionPage: React.FC = () => {
   const { id: applicationId, type: applicationType } = useParams();

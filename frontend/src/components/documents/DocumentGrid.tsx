@@ -1,7 +1,9 @@
 import React from 'react';
+
+import type { Document } from '../../types/api';
+import type { DocumentStatus, DocumentCategory } from '../../types/document';
+
 import { DocumentCard } from './DocumentCard';
-import type { DocumentStatus, DocumentCategory } from '../types/document';
-import type { Document } from '../types/api';
 
 interface DocumentGridProps {
   categories: DocumentCategory[];

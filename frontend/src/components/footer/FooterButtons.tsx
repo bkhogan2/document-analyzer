@@ -1,6 +1,7 @@
-import React from 'react';
 import { ChevronLeft } from 'lucide-react';
-import { Button } from './Button';
+import React from 'react';
+
+import { Button } from '../ui';
 
 interface FooterButtonsProps {
   onBack?: () => void;

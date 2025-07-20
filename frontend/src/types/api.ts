@@ -7,13 +7,17 @@ export interface ApiResponse<T> {
 
 export interface Document {
   id: string;
-  name: string;
+  user_id: string;
   category_id: string;
+  filename: string;
+  original_filename: string;
   file_path: string;
-  status: string;
-  uploaded_at: string;
   file_size: number;
   mime_type: string;
+  status: string;
+  status_message?: string;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface DocumentUploadResponse {
