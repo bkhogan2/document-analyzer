@@ -63,7 +63,7 @@ const getApplicationNavigation = (appType: ApplicationType, appId: string): NavI
   },
   {
     label: 'Document Collection',
-    to: `/applications/${appType}/${appId}/steps/documents/1`,
+    to: `/applications/${appType}/${appId}/steps?page=document-collection`,
     icon: FileText,
     // enabled
   },

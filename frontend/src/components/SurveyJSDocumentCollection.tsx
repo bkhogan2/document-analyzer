@@ -51,9 +51,17 @@ export class SurveyQuestionDocumentCollection extends SurveyQuestionElementBase 
   }
 
   renderElement() {
+    // Get URL params for navigation
+    const params = new URLSearchParams(window.location.search);
+    const applicationId = params.get('id') || undefined;
+    const applicationType = params.get('type') || undefined;
+
     return (
-      <div className="p-6">
-        <DocumentCollectionStep />
+      <div className="p-8">
+        <DocumentCollectionStep 
+          applicationId={applicationId}
+          applicationType={applicationType}
+        />
       </div>
     );
   }
