@@ -10,234 +10,147 @@ export interface StatusStyling {
   textColor?: string;
 }
 
-// Document status type is now defined in types/document.ts
+// Centralized status configuration
+const STATUS_CONFIG = {
+  approved: {
+    icon: CheckCircle,
+    iconColor: 'text-green-600',
+    background: 'bg-green-50',
+    border: 'border-green-500',
+    iconBg: 'bg-green-100',
+    textColor: 'text-green-700',
+    badgeColor: 'bg-green-100 text-green-800',
+    tooltip: {
+      title: '✓ Approved',
+      description: 'This document has been reviewed and approved. No further action required.',
+      className: 'text-green-600',
+    }
+  },
+  warning: {
+    icon: AlertTriangle,
+    iconColor: 'text-yellow-600',
+    background: 'bg-yellow-50',
+    border: 'border-yellow-500',
+    iconBg: 'bg-yellow-100',
+    textColor: 'text-yellow-700',
+    badgeColor: 'bg-yellow-100 text-yellow-800',
+    tooltip: {
+      title: '⚠ Warning',
+      description: 'This document may need additional information or clarification.',
+      className: 'text-yellow-600',
+    }
+  },
+  error: {
+    icon: X,
+    iconColor: 'text-red-600',
+    background: 'bg-red-50',
+    border: 'border-red-500',
+    iconBg: 'bg-red-100',
+    textColor: 'text-red-700',
+    badgeColor: 'bg-red-100 text-red-800',
+    tooltip: {
+      title: '✗ Error',
+      description: 'This document has issues that need to be addressed before approval.',
+      className: 'text-red-600',
+    }
+  },
+  'under-review': {
+    icon: Clock,
+    iconColor: 'text-blue-600',
+    background: 'bg-blue-50',
+    border: 'border-blue-500',
+    iconBg: 'bg-blue-100',
+    textColor: 'text-blue-700',
+    badgeColor: 'bg-blue-100 text-blue-800',
+    tooltip: {
+      title: '⏳ Under Review',
+      description: 'This document is currently under review.',
+      className: 'text-blue-600',
+    }
+  },
+  rejected: {
+    icon: X,
+    iconColor: 'text-red-600',
+    background: 'bg-red-50',
+    border: 'border-red-500',
+    iconBg: 'bg-red-100',
+    textColor: 'text-red-700',
+    badgeColor: 'bg-red-100 text-red-800',
+    tooltip: {
+      title: '✗ Rejected',
+      description: 'This document was rejected. Please review and re-upload.',
+      className: 'text-red-600',
+    }
+  },
+  incomplete: {
+    icon: AlertTriangle,
+    iconColor: 'text-yellow-600',
+    background: 'bg-yellow-50',
+    border: 'border-yellow-500',
+    iconBg: 'bg-yellow-100',
+    textColor: 'text-yellow-700',
+    badgeColor: 'bg-yellow-100 text-yellow-800',
+    tooltip: {
+      title: '○ Incomplete',
+      description: 'This document is incomplete. Please upload the required file(s).',
+      className: 'text-yellow-600',
+    }
+  },
+  complete: {
+    icon: CheckCircle,
+    iconColor: 'text-green-600',
+    background: 'bg-green-50',
+    border: 'border-green-500',
+    iconBg: 'bg-green-100',
+    textColor: 'text-green-700',
+    badgeColor: 'bg-green-100 text-green-800',
+    tooltip: {
+      title: '✓ Complete',
+      description: 'This application is complete and ready for review.',
+      className: 'text-green-600',
+    }
+  },
+  default: {
+    icon: Circle,
+    iconColor: 'text-gray-400',
+    background: 'bg-white',
+    border: 'border-gray-200',
+    iconBg: 'bg-gray-100',
+    textColor: 'text-gray-700',
+    badgeColor: 'bg-gray-100 text-gray-800',
+    tooltip: {
+      title: '○ Pending',
+      description: 'This document has not been reviewed yet. Upload files to begin the review process.',
+      className: 'text-gray-600',
+    }
+  }
+} as const;
+
+// Helper function to get status config
+function getStatusConfig(status: DocumentStatus | string) {
+  return STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.default;
+}
 
 // Status icon component
 export function getStatusIcon(status: DocumentStatus, className = 'w-5 h-5') {
-  switch (status) {
-    case 'approved':
-      return <CheckCircle className={`${className} text-green-600`} />;
-    case 'warning':
-      return <AlertTriangle className={`${className} text-yellow-600`} />;
-    case 'error':
-      return <X className={`${className} text-red-600`} />;
-    case 'under-review':
-      return <Clock className={`${className} text-blue-600`} />;
-    case 'rejected':
-      return <X className={`${className} text-red-600`} />;
-    case 'incomplete':
-      return <AlertTriangle className={`${className} text-yellow-600`} />;
-    default:
-      return <Circle className={`${className} text-gray-400`} />;
-  }
-}
-
-// Status color classes
-export function getStatusColor(status: DocumentStatus) {
-  switch (status) {
-    case 'approved':
-      return 'text-green-600 bg-green-100';
-    case 'under-review':
-      return 'text-blue-600 bg-blue-100';
-    case 'incomplete':
-      return 'text-yellow-600 bg-yellow-100';
-    case 'rejected':
-      return 'text-red-600 bg-red-100';
-    case 'warning':
-      return 'text-yellow-600 bg-yellow-100';
-    case 'error':
-      return 'text-red-600 bg-red-100';
-    default:
-      return 'text-gray-600 bg-gray-100';
-  }
+  const config = getStatusConfig(status);
+  const IconComponent = config.icon;
+  return <IconComponent className={`${className} ${config.iconColor}`} />;
 }
 
 // Status styling object
 export function getStatusStyling(status: DocumentStatus): StatusStyling {
-  switch (status) {
-    case 'approved':
-      return {
-        background: 'bg-green-50',
-        border: 'border-green-500',
-        iconBg: 'bg-green-100',
-        textColor: 'text-green-700'
-      };
-    case 'warning':
-      return {
-        background: 'bg-yellow-50',
-        border: 'border-yellow-500',
-        iconBg: 'bg-yellow-100',
-        textColor: 'text-yellow-700'
-      };
-    case 'error':
-      return {
-        background: 'bg-red-50',
-        border: 'border-red-500',
-        iconBg: 'bg-red-100',
-        textColor: 'text-red-700'
-      };
-    case 'under-review':
-      return {
-        background: 'bg-blue-50',
-        border: 'border-blue-500',
-        iconBg: 'bg-blue-100',
-        textColor: 'text-blue-700'
-      };
-    case 'rejected':
-      return {
-        background: 'bg-red-50',
-        border: 'border-red-500',
-        iconBg: 'bg-red-100',
-        textColor: 'text-red-700'
-      };
-    case 'incomplete':
-      return {
-        background: 'bg-yellow-50',
-        border: 'border-yellow-500',
-        iconBg: 'bg-yellow-100',
-        textColor: 'text-yellow-700'
-      };
-    default:
-      return {
-        background: 'bg-white',
-        border: 'border-gray-200',
-        iconBg: 'bg-gray-100',
-        textColor: 'text-gray-700'
-      };
-  }
+  const config = getStatusConfig(status);
+  return {
+    background: config.background,
+    border: config.border,
+    iconBg: config.iconBg,
+    textColor: config.textColor
+  };
 }
 
 // Status tooltip data
 export function getStatusTooltip(status: DocumentStatus) {
-  switch (status) {
-    case 'approved':
-      return {
-        title: '✓ Approved',
-        description: 'This document has been reviewed and approved. No further action required.',
-        className: 'text-green-600',
-      };
-    case 'warning':
-      return {
-        title: '⚠ Warning',
-        description: 'This document may need additional information or clarification.',
-        className: 'text-yellow-600',
-      };
-    case 'error':
-      return {
-        title: '✗ Error',
-        description: 'This document has issues that need to be addressed before approval.',
-        className: 'text-red-600',
-      };
-    case 'under-review':
-      return {
-        title: '⏳ Under Review',
-        description: 'This document is currently under review.',
-        className: 'text-blue-600',
-      };
-    case 'rejected':
-      return {
-        title: '✗ Rejected',
-        description: 'This document was rejected. Please review and re-upload.',
-        className: 'text-red-600',
-      };
-    case 'incomplete':
-      return {
-        title: '○ Incomplete',
-        description: 'This document is incomplete. Please upload the required file(s).',
-        className: 'text-yellow-600',
-      };
-    default:
-      return {
-        title: '○ Pending',
-        description: 'This document has not been reviewed yet. Upload files to begin the review process.',
-        className: 'text-gray-600',
-      };
-  }
-}
-
-// Application status styling (for application-level status)
-export function getApplicationStatusStyling(status: string): StatusStyling {
-  switch (status) {
-    case 'approved':
-      return {
-        background: 'bg-green-50',
-        border: 'border-green-500',
-        iconBg: 'bg-green-100',
-        textColor: 'text-green-700'
-      };
-    case 'under-review':
-      return {
-        background: 'bg-blue-50',
-        border: 'border-blue-500',
-        iconBg: 'bg-blue-100',
-        textColor: 'text-blue-700'
-      };
-    case 'complete':
-      return {
-        background: 'bg-green-50',
-        border: 'border-green-500',
-        iconBg: 'bg-green-100',
-        textColor: 'text-green-700'
-      };
-    case 'rejected':
-      return {
-        background: 'bg-red-50',
-        border: 'border-red-500',
-        iconBg: 'bg-red-100',
-        textColor: 'text-red-700'
-      };
-    default: // incomplete
-      return {
-        background: 'bg-gray-50',
-        border: 'border-gray-500',
-        iconBg: 'bg-gray-100',
-        textColor: 'text-gray-700'
-      };
-  }
-}
-
-// Application status tooltip
-export function getApplicationStatusTooltip(status: string): string {
-  switch (status) {
-    case 'approved':
-      return 'Application has been approved';
-    case 'under-review':
-      return 'Application is currently under review';
-    case 'complete':
-      return 'Application is complete and ready for review';
-    case 'rejected':
-      return 'Application has been rejected';
-    default: // incomplete
-      return 'Application is incomplete';
-  }
-}
-
-// Status colors for badges
-export function getStatusColorForBadge(status: string): string {
-  switch (status) {
-    case 'approved':
-      return 'bg-green-100 text-green-800';
-    case 'under-review':
-      return 'bg-blue-100 text-blue-800';
-    case 'complete':
-      return 'bg-green-100 text-green-800';
-    case 'rejected':
-      return 'bg-red-100 text-red-800';
-    default: // incomplete
-      return 'bg-gray-100 text-gray-800';
-  }
-}
-
-// Document status colors for badges
-export function getDocumentStatusColorForBadge(status: DocumentStatus): string {
-  switch (status) {
-    case 'approved':
-      return 'bg-green-100 text-green-800';
-    case 'warning':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'error':
-      return 'bg-red-100 text-red-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
+  const config = getStatusConfig(status);
+  return config.tooltip;
 } 
