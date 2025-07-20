@@ -1,5 +1,5 @@
-import apiClient from './api';
-import type { UploadResponse, UploadOptions, UploadProgress, Document } from '../types/api';
+import api from './api';
+import type { DocumentUploadResponse, UploadOptions, UploadProgress, Document } from '../types/api';
 import { AxiosError } from 'axios';
 
 export class DocumentService {
@@ -8,7 +8,7 @@ export class DocumentService {
    */
   async getUserDocuments(userId: string = 'default'): Promise<Document[]> {
     try {
-      const response = await apiClient.get<Document[]>(`/files/documents/${userId}`);
+      const response = await api.get<Document[]>(`/files/documents/${userId}`);
       return response.data;
     } catch (error: unknown) {
       console.error('Error fetching documents:', error);
@@ -24,7 +24,7 @@ export class DocumentService {
     file: File, 
     userId: string = 'default',
     options?: UploadOptions
-  ): Promise<UploadResponse> {
+  ): Promise<DocumentUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('user_id', userId);
@@ -46,7 +46,7 @@ export class DocumentService {
     };
 
     try {
-      const response = await apiClient.post<UploadResponse>(
+      const response = await api.post<DocumentUploadResponse>(
         `/files/upload/${categoryId}`,
         formData,
         config
@@ -77,7 +77,7 @@ export class DocumentService {
     file: File, 
     userId: string = 'default',
     options?: UploadOptions
-  ): Promise<UploadResponse> {
+  ): Promise<DocumentUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('user_id', userId);
@@ -99,7 +99,7 @@ export class DocumentService {
     };
 
     try {
-      const response = await apiClient.post<UploadResponse>(
+      const response = await api.post<DocumentUploadResponse>(
         '/files/upload',
         formData,
         config
@@ -128,7 +128,7 @@ export class DocumentService {
    */
   async deleteDocument(documentId: string): Promise<void> {
     try {
-      await apiClient.delete(`/files/documents/${documentId}`);
+      await api.delete(`/files/documents/${documentId}`);
     } catch (error: unknown) {
       console.error('Error deleting document:', error);
       throw error;

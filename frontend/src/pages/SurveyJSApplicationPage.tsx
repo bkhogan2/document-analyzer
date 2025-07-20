@@ -11,7 +11,26 @@ export default function SurveyJSApplicationPage() {
   const params = useParams<{ type: string; id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { setCurrentSection, markSectionCompleted } = useApplicationStore();
+  const { setCurrentSection, markSectionCompleted, setFormData, selectApplication } = useApplicationStore();
+  
+  // Get current application to access form data
+  const currentApp = useApplicationStore(state => {
+    const currentId = state.currentApplicationId;
+    return currentId ? state.applications[currentId] : undefined;
+  });
+  
+  // Helper function to get form data for a specific step
+  const getFormData = (step: string): Record<string, unknown> => {
+    if (!currentApp?.formData) return {};
+    return (currentApp.formData[step] as Record<string, unknown>) || {};
+  };
+  
+  // Ensure application is selected when component mounts
+  React.useEffect(() => {
+    if (params.id && params.type) {
+      selectApplication(params.id, params.type);
+    }
+  }, [params.id, params.type, selectApplication]);
   
   const [survey] = React.useState(() => {
     const model = createSurveyJSModel({
@@ -22,17 +41,37 @@ export default function SurveyJSApplicationPage() {
     
     // Setup navigation (only if params are available)
     if (params.type && params.id) {
-      setupSurveyJSNavigation(model, { type: params.type, id: params.id }, navigate, setCurrentSection, markSectionCompleted);
+      setupSurveyJSNavigation(model, { type: params.type, id: params.id }, navigate, setCurrentSection, markSectionCompleted, setFormData);
     }
     
     // Setup completion handler
-    setupSurveyJSCompletion(model, (data) => {
+    setupSurveyJSCompletion(model, () => {
       // TODO: Handle survey completion - save data, navigate to next step, etc.
-      console.log('Survey data:', data);
     });
 
     return model;
   });
+
+  // Load existing data when survey is ready
+  React.useEffect(() => {
+    if (survey && currentApp?.formData) {
+      // Collect all data from all pages
+      const allData: Record<string, unknown> = {};
+      const pages = survey.pages;
+      pages.forEach((page: { name: string }) => {
+        const stepData = getFormData(page.name);
+        if (stepData && Object.keys(stepData).length > 0) {
+          // Merge data from this page
+          Object.assign(allData, stepData);
+        }
+      });
+      
+      // Set all data at once using SurveyJS's built-in mechanism
+      if (Object.keys(allData).length > 0) {
+        survey.data = allData;
+      }
+    }
+  }, [survey, currentApp?.formData, getFormData]);
 
   // Set initial page from URL parameter
   React.useEffect(() => {

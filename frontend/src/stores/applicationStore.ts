@@ -78,13 +78,7 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       currentApplicationId: null,
 
       selectApplication: (id, type) => {
-        console.log('[store] selectApplication', { id, type });
         const state = get();
-        console.log('[store] Current state:', {
-          currentApplicationId: state.currentApplicationId,
-          applications: Object.keys(state.applications),
-          selectedApp: state.applications[id]
-        });
         if (state.currentApplicationId === id && state.applications[id]) return;
         // If not initialized, initialize
         if (!state.applications[id]) {
@@ -94,7 +88,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       setCurrentStep: (stepIndex) => {
-        console.log('[store] setCurrentStep', { stepIndex });
         const id = get().currentApplicationId;
         if (!id) return;
         set(state => {
@@ -118,7 +111,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       setCurrentSection: (sectionIndex) => {
-        console.log('[store] setCurrentSection', { sectionIndex });
         const id = get().currentApplicationId;
         if (!id) return;
         set(state => {
@@ -143,7 +135,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       updateSectionProgress: (sectionId, progress) => {
-        console.log('[store] updateSectionProgress', { sectionId, progress });
         const id = get().currentApplicationId;
         if (!id) return;
         set(state => {
@@ -167,7 +158,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       markStepCompleted: (stepId, completed) => {
-        console.log('[store] markStepCompleted', { stepId, completed });
         const id = get().currentApplicationId;
         if (!id) return;
         set(state => {
@@ -201,7 +191,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       markSectionCompleted: (sectionId, completed) => {
-        console.log('[store] markSectionCompleted', { sectionId, completed });
         const id = get().currentApplicationId;
         if (!id) return;
         set(state => {
@@ -232,7 +221,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       setFormData: (step, data) => {
-        console.log('[store] setFormData', { step, data });
         const id = get().currentApplicationId;
         if (!id) return;
         set(state => {
@@ -258,7 +246,6 @@ export const useApplicationStore = create<ApplicationStoreState>()(
       },
 
       resetApplication: (id, type = 'sba') => {
-        console.log('[store] resetApplication', { id, type });
         set(state => ({
           applications: {
             ...state.applications,
@@ -289,8 +276,8 @@ export const useApplicationStore = create<ApplicationStoreState>()(
     }),
     {
       name: 'application-store',
-      onRehydrateStorage: () => (state) => {
-        console.log('[store] Rehydrated state:', state);
+      onRehydrateStorage: () => () => {
+        // State rehydrated from localStorage
       },
     }
   )
