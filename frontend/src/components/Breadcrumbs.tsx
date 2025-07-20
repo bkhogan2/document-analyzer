@@ -20,6 +20,20 @@ export const Breadcrumbs: React.FC = () => {
     return cat ? cat.title : categoryId;
   };
 
+  const getCurrentPageTitle = (pageName: string): string => {
+    const pageTitleMap: Record<string, string> = {
+      'welcome': 'Welcome',
+      'loan-information': 'Loan Information',
+      'business-info': 'Business Information',
+      'owner-information': 'Owner Information',
+      'certification': 'Certification',
+      'pre-screen-questions': 'Pre-Screen Questions',
+      'document-collection': 'Document Collection',
+      'review': 'Review Application'
+    };
+    return pageTitleMap[pageName] || pageName;
+  };
+
   const getBreadcrumbs = (): BreadcrumbItem[] => {
     const pathname = location.pathname;
     const breadcrumbs: BreadcrumbItem[] = [
@@ -34,11 +48,20 @@ export const Breadcrumbs: React.FC = () => {
           label: params.id, 
           to: `/applications/${params.type}/${params.id}/home` 
         });
-        // Document collection
-        if (pathname.includes('/documents')) {
+        
+        // Document collection (SurveyJS page)
+        if (pathname.includes('/steps') && location.search.includes('page=document-collection')) {
+          breadcrumbs.push({
+            label: 'Document Collection',
+            to: `/applications/${params.type}/${params.id}/steps?page=document-collection`,
+            current: true
+          });
+        }
+        // Document collection (legacy page)
+        else if (pathname.includes('/documents')) {
           breadcrumbs.push({
             label: 'Documents',
-            to: `/applications/${params.type}/${params.id}/documents`,
+            to: `/applications/${params.type}/${params.id}/steps?page=document-collection`,
             current: !params.categoryId
           });
           // Document detail
@@ -48,8 +71,31 @@ export const Breadcrumbs: React.FC = () => {
               current: true
             });
           }
-        } else {
-          // On home page
+        }
+        // SurveyJS application pages
+        else if (pathname.includes('/steps')) {
+          const urlParams = new URLSearchParams(location.search);
+          const pageParam = urlParams.get('page');
+          
+          if (pageParam && pageParam !== 'document-collection') {
+            breadcrumbs.push({
+              label: 'Application',
+              to: `/applications/${params.type}/${params.id}/steps`
+            });
+            breadcrumbs.push({
+              label: getCurrentPageTitle(pageParam),
+              current: true
+            });
+          } else {
+            breadcrumbs.push({
+              label: 'Application',
+              to: `/applications/${params.type}/${params.id}/steps`,
+              current: true
+            });
+          }
+        }
+        // On home page
+        else {
           breadcrumbs[breadcrumbs.length - 1].current = true;
         }
       }

@@ -4,11 +4,11 @@ export const documentCollectionSurveyConfig = {
   showProgressBar: false,
   showPageTitles: false,
   showPageNumbers: false,
+  showEmptyDescriptions: false,
   pageNextText: "Continue",
   pagePrevText: "‹ Back",
   completeText: "Submit",
   title: "Welcome",
-  description: "Complete your SBA loan application step by step.",
   pages: [
     {
       name: "welcome",
