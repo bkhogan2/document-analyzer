@@ -1,8 +1,9 @@
 import React from 'react';
-import { Stepper } from './Stepper';
-import { useApplicationStore } from '../stores/applicationStore';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getSurveyPageNames } from '../data/surveyPageConfig';
+
+import { getSurveyPageNames } from '../../data/surveyPageConfig';
+import { useApplicationStore } from '../../stores/applicationStore';
+import { Stepper } from '../ui';
 
 export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Get current application state using stable selectors

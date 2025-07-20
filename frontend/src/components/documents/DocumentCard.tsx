@@ -1,13 +1,14 @@
-import React from 'react';
-import { Upload } from 'lucide-react';
-import { StatusIcon } from './StatusIcon';
-import { getStatusStyling } from '../utils/statusUtils';
-import { FileList } from './FileList';
-import type { DocumentCategory, DocumentStatus } from '../types/document';
-import type { Document } from '../types/api';
-import { Button } from './Button';
-import { DragAndDropArea } from './DragAndDropArea';
+   import { Upload } from 'lucide-react';
+ import React from 'react';
 
+  import type { Document } from '../../types/api';
+  import type { DocumentCategory, DocumentStatus } from '../../types/document';
+  import { getStatusStyling } from '../../utils/statusUtils';
+  import { StatusIcon , Button , DragAndDropArea } from '../ui';
+
+  import { FileList } from './FileList';
+
+    
 interface DocumentCardProps {
   category: DocumentCategory;
   documents: Document[];

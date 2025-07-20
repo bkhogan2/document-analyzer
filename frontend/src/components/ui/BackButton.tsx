@@ -1,6 +1,7 @@
+import { ArrowLeft } from 'lucide-react';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+
 import { Button } from './Button';
 
 interface BackButtonProps {

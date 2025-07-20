@@ -1,38 +1,61 @@
-import { useEffect } from 'react';
-import { DynamicSidebar } from './components/DynamicSidebar';
-import { Header } from './components/Header';
-import { ApplicationLayout } from './components/ApplicationLayout';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
+
+import { DynamicSidebar, Header, ApplicationLayout, StickyFooter } from './components/layout';
+import ApplicationHomePage from './pages/ApplicationHomePage';
+import ApplicationsPage from './pages/ApplicationsPage';
 import { DocumentCollectionPage } from './pages/DocumentCollectionPage';
 import { DocumentDetailPage } from './pages/DocumentDetailPage';
 import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
-import ApplicationsPage from './pages/ApplicationsPage';
-import { useDocumentStore } from './stores/documentStore';
-import ApplicationHomePage from './pages/ApplicationHomePage';
+import { NotFound } from './pages/NotFound';
 import SurveyJSApplicationPage from './pages/SurveyJSApplicationPage';
-import { NotFound } from './components/NotFound';
+import { useDocumentStore } from './stores/documentStore';
 
 function Layout() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <DynamicSidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <Outlet />
+      <DynamicSidebar 
+        isMobileOpen={isMobileMenuOpen}
+        onMobileToggle={handleMobileMenuToggle}
+      />
+      <div className="flex-1 flex flex-col lg:ml-0">
+        <Header onMobileMenuToggle={handleMobileMenuToggle} />
+        <div className="flex-1 pb-16 lg:pb-0">
+          <Outlet />
+        </div>
+        <StickyFooter />
       </div>
     </div>
   );
 }
 
 function ApplicationLayoutWrapper() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <DynamicSidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
+      <DynamicSidebar 
+        isMobileOpen={isMobileMenuOpen}
+        onMobileToggle={handleMobileMenuToggle}
+      />
+      <div className="flex-1 flex flex-col lg:ml-0">
+        <Header onMobileMenuToggle={handleMobileMenuToggle} />
         <ApplicationLayout>
-          <Outlet />
+          <div className="pb-16 lg:pb-0">
+            <Outlet />
+          </div>
         </ApplicationLayout>
+        <StickyFooter />
       </div>
     </div>
   );

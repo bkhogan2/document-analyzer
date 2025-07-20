@@ -1,6 +1,8 @@
-import api from './api';
-import type { DocumentUploadResponse, UploadOptions, UploadProgress, Document } from '../types/api';
 import { AxiosError } from 'axios';
+
+import type { DocumentUploadResponse, UploadOptions, UploadProgress, Document } from '../types/api';
+
+import api from './api';
 
 export class DocumentService {
   /**

@@ -1,10 +1,11 @@
 import React from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Survey } from 'survey-react-ui';
 import 'survey-core/survey-core.css';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+
+import { Breadcrumbs } from '../components/ui';
 import { createSurveyJSModel, setupSurveyJSNavigation, setupSurveyJSCompletion } from '../services/surveyJSService';
-import { Breadcrumbs } from '../components/Breadcrumbs';
-import '../components/SurveyJSDocumentCollection'; // Import to register the custom component
+import '../components/form/SurveyJSDocumentCollection'; // Import to register the custom component
 import { useApplicationStore } from '../stores/applicationStore';
 
 export default function SurveyJSApplicationPage() {
@@ -112,7 +113,7 @@ export default function SurveyJSApplicationPage() {
   };
 
   return (
-    <div className="flex-1 px-8 pt-16 pb-12">
+    <div className="flex-1 px-4 lg:px-8 pt-16 pb-12">
       <div>
         <div className="bg-white rounded-lg mx-auto" style={{ maxWidth: '80rem' }}>
           <Breadcrumbs />
@@ -120,23 +121,23 @@ export default function SurveyJSApplicationPage() {
             <Survey model={survey} />
           </div>
           {/* Custom footer */}
-          <div className="border-t border-gray-200 bg-white mt-12 py-4">
-            <div className="flex justify-between items-center">
+          <div className="border-t border-gray-200 bg-white mt-8 lg:mt-12 py-4">
+            <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0 lg:space-x-4">
               <button 
-                className="text-gray-600 hover:text-gray-800 font-medium"
+                className="text-gray-600 hover:text-gray-800 font-medium w-full lg:w-auto text-center lg:text-left"
                 onClick={handleBack}
               >
                 ‹ Back
               </button>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-2 lg:gap-4 w-full lg:w-auto">
                 <button 
-                  className="border-2 border-green-600 text-green-600 px-3 py-1.5 rounded hover:bg-green-50 font-medium"
+                  className="border-2 border-green-600 text-green-600 px-3 py-1.5 rounded hover:bg-green-50 font-medium w-full sm:w-auto"
                   onClick={handleSkip}
                 >
                   Skip for now
                 </button>
                 <button 
-                  className="bg-green-600 text-white px-5 py-1.5 rounded hover:bg-green-700 font-medium"
+                  className="bg-green-600 text-white px-5 py-1.5 rounded hover:bg-green-700 font-medium w-full sm:w-auto"
                   onClick={handleContinue}
                 >
                   Continue

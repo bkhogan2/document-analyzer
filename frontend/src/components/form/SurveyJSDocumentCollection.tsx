@@ -1,8 +1,7 @@
 import React from 'react';
-import { Serializer, QuestionFactory } from 'survey-core';
-import { Question } from 'survey-core';
-import { SurveyQuestionElementBase } from 'survey-react-ui';
-import { ReactQuestionFactory } from 'survey-react-ui';
+import { Serializer, QuestionFactory , Question } from 'survey-core';
+import { SurveyQuestionElementBase , ReactQuestionFactory } from 'survey-react-ui';
+
 import { DocumentCollectionStep } from './DocumentCollectionStep';
 
 // Custom SurveyJS question class for document collection

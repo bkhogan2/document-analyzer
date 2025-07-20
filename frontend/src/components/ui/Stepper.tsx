@@ -1,6 +1,7 @@
 import React from 'react';
-import { useApplicationStore } from '../stores/applicationStore';
-import type { ApplicationSection } from '../stores/applicationStore';
+
+import { useApplicationStore } from '../../stores/applicationStore';
+import type { ApplicationSection } from '../../stores/applicationStore';
 
 interface StepperProps {
   sections: ApplicationSection[];

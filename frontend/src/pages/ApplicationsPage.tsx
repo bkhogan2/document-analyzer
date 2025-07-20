@@ -1,10 +1,10 @@
-import React from 'react';
-import { Button } from '../components/Button';
 import { Eye, Plus, Briefcase, Trash } from 'lucide-react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+
+import { Button , Breadcrumbs } from '../components/ui';
 import { APPLICATION_TYPES } from '../constants/applicationTypes';
 import type { ApplicationType } from '../constants/applicationTypes';
-import { Breadcrumbs } from '../components/Breadcrumbs';
 import { useApplicationStore } from '../stores/applicationStore';
 
 const getStatusColor = (status: string) => {

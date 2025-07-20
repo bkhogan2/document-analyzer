@@ -1,5 +1,6 @@
-import type { DocumentCategory } from '../types/document';
 import { Calculator, CreditCard, TrendingUp, FileText, Building2, Users } from 'lucide-react';
+
+import type { DocumentCategory } from '../types/document';
 
 export const sbaDocumentCategories: DocumentCategory[] = [
   { 

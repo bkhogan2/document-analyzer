@@ -1,8 +1,9 @@
+import { ChevronRight } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
-import type { ApplicationType } from '../constants/applicationTypes';
-import { sbaDocumentCategories } from '../data/documentCategories';
+
+import type { ApplicationType } from '../../constants/applicationTypes';
+import { sbaDocumentCategories } from '../../data/documentCategories';
 
 interface BreadcrumbItem {
   label: string;

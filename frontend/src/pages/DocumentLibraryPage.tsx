@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
 import { FileText, Download, Eye, Calendar, User } from 'lucide-react';
-import { Breadcrumbs } from '../components/Breadcrumbs';
+import React, { useEffect } from 'react';
+
+import { Breadcrumbs } from '../components/ui';
 import { useDocumentStore } from '../stores/documentStore';
 
 const getStatusColor = (status: string) => {
@@ -44,7 +45,7 @@ export const DocumentLibraryPage: React.FC = () => {
     id: doc.id,
     applicationId: doc.user_id, // Using user_id as applicationId for now
     applicationName: `Application ${doc.user_id}`,
-    filename: doc.filename,
+    filename: doc.original_filename,
     category: doc.category_id,
     fileSize: `${Math.round(doc.file_size / 1024)} KB`,
     uploadedAt: doc.created_at,

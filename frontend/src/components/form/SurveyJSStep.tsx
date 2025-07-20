@@ -1,8 +1,8 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
-import { PageHeader } from '../PageHeader';
-import { Breadcrumbs } from '../Breadcrumbs';
+
+import { PageHeader , Breadcrumbs } from '../ui';
 
 export interface SurveyJSStepRef {
   submitForm: () => void;
