@@ -10,6 +10,17 @@ export interface SurveyJSConfig {
   showQuestionNumbers?: boolean;
 }
 
+// Utility function to get page names from survey config
+export function getSurveyPageNames(): string[] {
+  return documentCollectionSurveyConfig.pages.map(page => page.name);
+}
+
+// Utility function to get page name by index
+export function getSurveyPageNameByIndex(index: number): string {
+  const pages = documentCollectionSurveyConfig.pages;
+  return pages[index]?.name || 'welcome';
+}
+
 export function createSurveyJSModel(config: SurveyJSConfig = {}) {
   const model = new Model(documentCollectionSurveyConfig);
   

@@ -2,6 +2,7 @@ import React from 'react';
 import { Stepper } from './Stepper';
 import { useApplicationStore } from '../stores/applicationStore';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getSurveyPageNames } from '../services/surveyJSService';
 
 export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Get current application state using stable selectors
@@ -18,29 +19,14 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
   const params = useParams<{ type: string; id: string }>();
 
   const handleSectionClick = (sectionIndex: number) => {
-    // Only allow clicking on completed sections or the current section
-    const section = sections[sectionIndex];
-    const canNavigate = section.isCompleted || sectionIndex === currentSectionIndex;
+    // Always allow navigation to any section
+    setCurrentSection(sectionIndex);
     
-    if (canNavigate) {
-      setCurrentSection(sectionIndex);
-    }
-    
-    if (canNavigate && params.type && params.id) {
-      // Find the first step in the selected section
-      const section = sections[sectionIndex];
-      if (section) {
-        const firstStepInSection = currentApp?.steps.find(s => s.sectionId === section.id);
-        if (firstStepInSection) {
-          // Parse step ID like "owner-info-1" -> section: "owner-info", step: "1"
-          const parts = firstStepInSection.id.split('-');
-          const stepNumber = parts[parts.length - 1]; // Last part is the step number
-          const sectionId = parts.slice(0, -1).join('-'); // Everything except last part is section
-          navigate(`/applications/${params.type}/${params.id}/steps/${sectionId}/${stepNumber}`);
-        } else {
-          navigate(`/applications/${params.type}/${params.id}/steps`);
-        }
-      }
+    if (params.type && params.id) {
+      // Use the survey page names directly from the config
+      const surveyPageNames = getSurveyPageNames();
+      const pageName = surveyPageNames[sectionIndex] || 'welcome';
+      navigate(`/applications/${params.type}/${params.id}/steps?page=${pageName}`);
     }
   };
 
