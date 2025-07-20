@@ -18,8 +18,15 @@ export const ApplicationLayout: React.FC<{ children: React.ReactNode }> = ({ chi
   const params = useParams<{ type: string; id: string }>();
 
   const handleSectionClick = (sectionIndex: number) => {
-    setCurrentSection(sectionIndex);
-    if (params.type && params.id) {
+    // Only allow clicking on completed sections or the current section
+    const section = sections[sectionIndex];
+    const canNavigate = section.isCompleted || sectionIndex === currentSectionIndex;
+    
+    if (canNavigate) {
+      setCurrentSection(sectionIndex);
+    }
+    
+    if (canNavigate && params.type && params.id) {
       // Find the first step in the selected section
       const section = sections[sectionIndex];
       if (section) {

@@ -35,6 +35,12 @@ export const minimalTheme = {
     "--sjs-survey-title-font-weight": "var(--ds-font-semibold, 600)",
     "--sjs-survey-title-padding": "var(--ds-spacing-none, 0) 0 var(--ds-spacing-lg, 1rem) 0",
     
+    // Page title (for individual page titles)
+    "--sjs-page-title-color": "var(--ds-text-primary, #1f2937)",
+    "--sjs-page-title-font-size": "var(--ds-text-2xl, 1.5rem)",
+    "--sjs-page-title-font-weight": "var(--ds-font-semibold, 600)",
+    "--sjs-page-title-padding": "var(--ds-spacing-none, 0) 0 var(--ds-spacing-lg, 1rem) 0",
+    
     // Survey description (matches your app's description styling)
     "--sjs-survey-description-color": "var(--ds-text-secondary, #6b7280)",
     "--sjs-survey-description-font-size": "var(--ds-text-lg, 1.125rem)",

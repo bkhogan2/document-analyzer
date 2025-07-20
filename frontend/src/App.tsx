@@ -9,8 +9,8 @@ import { DocumentLibraryPage } from './pages/DocumentLibraryPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { useDocumentStore } from './stores/documentStore';
 import ApplicationHomePage from './pages/ApplicationHomePage';
-import RHFApplicationWizard from './pages/RHFApplicationWizard';
 import SurveyJSTestPage from './pages/SurveyJSTestPage';
+import SurveyJSApplicationPage from './pages/SurveyJSApplicationPage';
 import { NotFound } from './components/NotFound';
 
 function Layout() {
@@ -85,9 +85,10 @@ function App() {
           <Route path=":type/:id/home" element={<ApplicationHomePage />} />
           <Route path=":type/:id/documents" element={<DocumentCollectionPage />} />
           <Route path=":type/:id/documents/:categoryId" element={<DocumentDetailPage />} />
-          <Route path=":type/:id/steps" element={<RHFApplicationWizard />} />
-          <Route path=":type/:id/steps/:section" element={<RHFApplicationWizard />} />
-          <Route path=":type/:id/steps/:section/:step" element={<RHFApplicationWizard />} />
+          <Route path=":type/:id/steps" element={<SurveyJSApplicationPage />} />
+          <Route path=":type/:id/steps/:section" element={<SurveyJSApplicationPage />} />
+          <Route path=":type/:id/steps/:section/:step" element={<SurveyJSApplicationPage />} />
+          <Route path=":type/:id/surveyjs" element={<SurveyJSApplicationPage />} />
         </Route>
       </Route>
       {/* 404 route */}
