@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 
-import { DynamicSidebar, Header, ApplicationLayout, StickyFooter } from './components/layout';
+import { Sidebar, Header, ApplicationLayout, StickyFooter } from './components/layout';
 import ApplicationHomePage from './pages/ApplicationHomePage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { DocumentCollectionPage } from './pages/DocumentCollectionPage';
@@ -20,7 +20,7 @@ function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <DynamicSidebar 
+      <Sidebar 
         isMobileOpen={isMobileMenuOpen}
         onMobileToggle={handleMobileMenuToggle}
       />
@@ -44,7 +44,7 @@ function ApplicationLayoutWrapper() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <DynamicSidebar 
+      <Sidebar 
         isMobileOpen={isMobileMenuOpen}
         onMobileToggle={handleMobileMenuToggle}
       />
