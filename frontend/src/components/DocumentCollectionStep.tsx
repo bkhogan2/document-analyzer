@@ -42,7 +42,10 @@ export const DocumentCollectionStep: React.FC<DocumentCollectionStepProps> = ({ 
   }, [appId, appType, selectApplication]);
 
   useEffect(() => {
-    fetchDocuments();
+    // Only fetch documents if we're not in SurveyJS context (where backend might not be available)
+    if (!applicationId && !applicationType) {
+      fetchDocuments();
+    }
   }, [fetchDocuments]);
 
   const getDocumentsByCategory = (categoryId: string) => {
