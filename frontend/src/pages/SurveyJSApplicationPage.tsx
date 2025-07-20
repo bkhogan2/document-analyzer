@@ -5,11 +5,13 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createSurveyJSModel, setupSurveyJSNavigation, setupSurveyJSCompletion } from '../services/surveyJSService';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import '../components/SurveyJSDocumentCollection'; // Import to register the custom component
+import { useApplicationStore } from '../stores/applicationStore';
 
 export default function SurveyJSApplicationPage() {
   const params = useParams<{ type: string; id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setCurrentSection, markSectionCompleted } = useApplicationStore();
   
   const [survey] = React.useState(() => {
     const model = createSurveyJSModel({
@@ -20,7 +22,7 @@ export default function SurveyJSApplicationPage() {
     
     // Setup navigation (only if params are available)
     if (params.type && params.id) {
-      setupSurveyJSNavigation(model, { type: params.type, id: params.id }, navigate);
+      setupSurveyJSNavigation(model, { type: params.type, id: params.id }, navigate, setCurrentSection, markSectionCompleted);
     }
     
     // Setup completion handler
@@ -49,12 +51,14 @@ export default function SurveyJSApplicationPage() {
   const handleBack = () => {
     if (survey.currentPageNo > 0) {
       survey.prevPage();
+      // The section will be updated by the onCurrentPageChanged event
     }
   };
 
   const handleContinue = () => {
     if (survey.currentPageNo < survey.pageCount - 1) {
       survey.nextPage();
+      // The section will be updated by the onCurrentPageChanged event
     } else {
       survey.completeLastPage();
     }
@@ -64,6 +68,7 @@ export default function SurveyJSApplicationPage() {
     // Skip to next page
     if (survey.currentPageNo < survey.pageCount - 1) {
       survey.nextPage();
+      // The section will be updated by the onCurrentPageChanged event
     }
   };
 
