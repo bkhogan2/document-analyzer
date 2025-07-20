@@ -4,7 +4,7 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 
 import type { ApplicationType } from '../../constants/applicationTypes';
 
-export const StickyFooter: React.FC = () => {
+export const MobileNavigation: React.FC = () => {
   const location = useLocation();
   const params = useParams<{ type?: ApplicationType; id?: string }>();
   const navigate = useNavigate();
