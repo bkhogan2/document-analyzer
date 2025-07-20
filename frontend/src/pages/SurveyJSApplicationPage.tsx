@@ -130,13 +130,13 @@ export default function SurveyJSApplicationPage() {
               </button>
               <div className="flex gap-4">
                 <button 
-                  className="border-2 border-green-500 text-green-500 px-3 py-1.5 rounded hover:bg-green-50 font-medium"
+                  className="border-2 border-green-600 text-green-600 px-3 py-1.5 rounded hover:bg-green-50 font-medium"
                   onClick={handleSkip}
                 >
                   Skip for now
                 </button>
                 <button 
-                  className="bg-green-500 text-white px-5 py-1.5 rounded hover:bg-green-600 font-medium"
+                  className="bg-green-600 text-white px-5 py-1.5 rounded hover:bg-green-700 font-medium"
                   onClick={handleContinue}
                 >
                   Continue

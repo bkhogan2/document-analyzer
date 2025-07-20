@@ -24,11 +24,9 @@ const ApplicationHomePage: React.FC = () => {
     : {};
   const applicantName = typeof welcome.applicantName === 'string' ? welcome.applicantName : '';
   const applicantEmail = typeof welcome.applicantEmail === 'string' ? welcome.applicantEmail : '';
-  const streetAddress = typeof welcome.streetAddress === 'string' ? welcome.streetAddress : '';
-  const city = typeof welcome.city === 'string' ? welcome.city : '';
-  const stateVal = typeof welcome.state === 'string' ? welcome.state : '';
-  const zip = typeof welcome.zip === 'string' ? welcome.zip : '';
-  const address = [streetAddress, city, stateVal, zip].filter(Boolean).join(', ');
+  const phone = typeof welcome.phone === 'string' ? welcome.phone : '';
+  const address = typeof welcome.address === 'string' ? welcome.address : '';
+  
   // Get initials for avatar
   const initials = applicantName
     ? applicantName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -95,9 +93,16 @@ const ApplicationHomePage: React.FC = () => {
               <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <span>{applicantEmail}</span>
               </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <span>{address}</span>
-              </div>
+              {phone && (
+                <div className="flex items-center space-x-3 text-sm text-gray-600">
+                  <span>{phone}</span>
+                </div>
+              )}
+              {address && (
+                <div className="flex items-center space-x-3 text-sm text-gray-600">
+                  <span>{address}</span>
+                </div>
+              )}
             </div>
           </div>
           {/* Continue Application Card */}
