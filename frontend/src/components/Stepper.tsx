@@ -18,13 +18,10 @@ export const Stepper: React.FC<StepperProps> = ({
   const { setCurrentSection } = useApplicationStore();
 
   const handleSectionClick = (sectionIndex: number) => {
-    // Only allow clicking on completed sections or the current section
-    const section = sections[sectionIndex];
-    const canNavigate = section.isCompleted || sectionIndex === currentSection;
-    
-    if (canNavigate && onSectionClick) {
+    // Always allow clicking on any section
+    if (onSectionClick) {
       onSectionClick(sectionIndex);
-    } else if (canNavigate) {
+    } else {
       setCurrentSection(sectionIndex);
     }
   };
@@ -51,17 +48,16 @@ export const Stepper: React.FC<StepperProps> = ({
       <div className="flex justify-between mt-0.5">
         {sections.map((section, idx) => {
           const isCurrent = idx === currentSection;
-          const canClick = section.isCompleted || isCurrent;
           
           return (
             <div
               key={section.id}
               className={`text-[10px] text-left font-normal transition-colors duration-200 ${
                 isCurrent ? 'text-black font-semibold' : 'text-gray-500'
-              } ${canClick ? 'cursor-pointer hover:text-blue-600' : 'cursor-default'}`}
+              } cursor-pointer hover:text-blue-600`}
               style={{ flex: section.stepCount }}
               onClick={() => handleSectionClick(idx)}
-              title={canClick ? `Click to go to ${section.label}` : `${section.label} (not yet available)`}
+              title={`Click to go to ${section.label}`}
             >
               {section.label}
             </div>
