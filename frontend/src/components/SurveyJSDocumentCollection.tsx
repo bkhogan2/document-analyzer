@@ -57,12 +57,10 @@ export class SurveyQuestionDocumentCollection extends SurveyQuestionElementBase 
     const applicationType = params.get('type') || undefined;
 
     return (
-      <div className="p-8">
         <DocumentCollectionStep 
           applicationId={applicationId}
           applicationType={applicationType}
         />
-      </div>
     );
   }
 }

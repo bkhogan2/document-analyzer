@@ -77,7 +77,13 @@ const ApplicationsPage: React.FC = () => {
               const name = typeof welcome.applicantName === 'string' ? welcome.applicantName : application.id;
               const email = typeof welcome.applicantEmail === 'string' ? welcome.applicantEmail : '';
               const primaryApplicant = typeof welcome.applicantName === 'string' ? welcome.applicantName : '';
-              const requestedAmount = typeof welcome.requestedAmount === 'number' || typeof welcome.requestedAmount === 'string' ? welcome.requestedAmount : '';
+              
+              // Get loan amount from loan-information page
+              const loanInfo = (typeof application.formData?.['loan-information'] === 'object' && application.formData?.['loan-information'] !== null)
+                ? application.formData['loan-information'] as Record<string, unknown>
+                : {};
+              const requestedAmount = typeof loanInfo.loanAmount === 'number' || typeof loanInfo.loanAmount === 'string' ? loanInfo.loanAmount : '';
+              
               const status = 'incomplete';
               return (
                 <div key={application.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
