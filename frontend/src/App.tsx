@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 
-import { Sidebar, Header, ApplicationLayout, StickyFooter } from './components/layout';
+import { Sidebar, Header, ApplicationLayout, MobileNavigation } from './components/layout';
 import ApplicationHomePage from './pages/ApplicationHomePage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import { DocumentCollectionPage } from './pages/DocumentCollectionPage';
@@ -29,7 +29,7 @@ function Layout() {
         <div className="flex-1 pb-16 lg:pb-0">
           <Outlet />
         </div>
-        <StickyFooter />
+        <MobileNavigation />
       </div>
     </div>
   );
@@ -55,7 +55,7 @@ function ApplicationLayoutWrapper() {
             <Outlet />
           </div>
         </ApplicationLayout>
-        <StickyFooter />
+        <MobileNavigation />
       </div>
     </div>
   );
