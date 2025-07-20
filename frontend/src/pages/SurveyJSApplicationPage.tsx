@@ -3,6 +3,7 @@ import { Survey } from 'survey-react-ui';
 import 'survey-core/survey-core.css';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createSurveyJSModel, setupSurveyJSNavigation, setupSurveyJSCompletion } from '../services/surveyJSService';
+import { Breadcrumbs } from '../components/Breadcrumbs';
 
 export default function SurveyJSApplicationPage() {
   const params = useParams<{ type: string; id: string }>();
@@ -69,6 +70,7 @@ export default function SurveyJSApplicationPage() {
     <div className="flex-1 px-8 pt-16 pb-12">
       <div>
         <div className="bg-white rounded-lg mx-auto" style={{ maxWidth: '80rem' }}>
+          <Breadcrumbs />
           <div>
             <Survey model={survey} />
           </div>

@@ -2,6 +2,10 @@ import { Model } from 'survey-core';
 import { minimalTheme } from '../themes/minimalTheme';
 import { documentCollectionSurveyConfig } from '../data/documentCollectionSurvey';
 
+// Global SurveyJS settings
+import { settings } from 'survey-core';
+settings.designMode.showEmptyDescriptions = false;
+
 export interface SurveyJSConfig {
   showNavigationButtons?: boolean;
   showProgressBar?: boolean;
